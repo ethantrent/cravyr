@@ -210,7 +210,11 @@ export function RestaurantDetailScreen() {
           {restaurant.phone_number && (
             <Pressable
               style={styles.actionBarButton}
-              onPress={() => Linking.openURL(`tel:${restaurant.phone_number}`)}
+              onPress={async () => {
+                const telUrl = `tel:${restaurant.phone_number}`;
+                const canOpen = await Linking.canOpenURL(telUrl);
+                if (canOpen) await Linking.openURL(telUrl);
+              }}
               accessibilityLabel="Call restaurant"
             >
               <Ionicons name="call" size={22} color="#ababab" />
