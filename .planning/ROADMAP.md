@@ -65,7 +65,15 @@
   5. Tapping "Undo" after a swipe returns the last-swiped card to the front of the deck.
   6. The Settings screen contains a working "Delete Account" option that removes the user's data from Supabase (required by App Store guideline 5.1.1).
   7. When the card deck reaches zero restaurants matching current preferences, an empty state with a filter-reset CTA is shown (no blank screen or crash).
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — Shared types (@cravyr/shared), Zustand stores, navigation layout (root Stack + tabs)
+- [ ] 04-02-PLAN.md — SwipeCard, OverlayLabels, CardSkeleton, SwipeDeck component, Discover screen
+- [ ] 04-03-PLAN.md — RestaurantRow component, Tonight's Picks screen (saved.tsx)
+- [ ] 04-04-PLAN.md — PhotoGallery component, Restaurant detail view (restaurant/[id].tsx)
+- [ ] 04-05-PLAN.md — Preferences screen, Settings screen + Express DELETE /api/v1/users/me
+
 **UI hint**: yes
 
 ### Phase 5: Push Notifications + App Store Submission
@@ -88,5 +96,5 @@
 | 1. Monorepo Scaffold + Infrastructure | 0/TBD | Not started | - |
 | 2. API + Database Layer | 0/TBD | Not started | - |
 | 3. Authentication + Onboarding | 0/TBD | Not started | - |
-| 4. Swipe Core + Secondary Screens | 0/TBD | Not started | - |
+| 4. Swipe Core + Secondary Screens | 0/5 | Not started | - |
 | 5. Push Notifications + App Store Submission | 0/TBD | Not started | - |
