@@ -9,7 +9,7 @@
 - [ ] **Phase 1: Monorepo Scaffold + Infrastructure** — Turborepo/pnpm workspace, Supabase schema + PostGIS + RLS, Render account provisioning
 - [ ] **Phase 2: API + Database Layer** — Express v5 backend, Google Places proxy with field masks + caching, PostGIS recommendation function
 - [ ] **Phase 3: Authentication + Onboarding** — Supabase auth (email + Google + Apple), onboarding flow, Expo Router auth guard
-- [ ] **Phase 4: Swipe Core + Secondary Screens** — SwipeDeck component, swipe recording, Tonight's Picks, detail view, preferences, settings
+- [ ] **Phase 4: Swipe Core + Secondary Screens** — SwipeDeck component, swipe recording, Tonight's Picks, detail view, preferences, settings (gap closure in progress)
 - [ ] **Phase 5: Push Notifications + App Store Submission** — Expo Push, daily 6PM cron, EAS build, TestFlight, App Store submission
 
 ## Phase Details
@@ -65,14 +65,15 @@
   5. Tapping "Undo" after a swipe returns the last-swiped card to the front of the deck.
   6. The Settings screen contains a working "Delete Account" option that removes the user's data from Supabase (required by App Store guideline 5.1.1).
   7. When the card deck reaches zero restaurants matching current preferences, an empty state with a filter-reset CTA is shown (no blank screen or crash).
-**Plans**: 5 plans
+**Plans**: 6 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Shared types (@cravyr/shared), Zustand stores, navigation layout (root Stack + tabs)
-- [ ] 04-02-PLAN.md — SwipeCard, OverlayLabels, CardSkeleton, SwipeDeck component, Discover screen
-- [ ] 04-03-PLAN.md — RestaurantRow component, Tonight's Picks screen (saved.tsx)
-- [ ] 04-04-PLAN.md — PhotoGallery component, Restaurant detail view (restaurant/[id].tsx)
-- [ ] 04-05-PLAN.md — Preferences screen, Settings screen + Express DELETE /api/v1/users/me
+- [x] 04-01-PLAN.md — Shared types (@cravyr/shared), Zustand stores, navigation layout (root Stack + tabs)
+- [x] 04-02-PLAN.md — SwipeCard, OverlayLabels, CardSkeleton, SwipeDeck component, Discover screen
+- [x] 04-03-PLAN.md — RestaurantRow component, Tonight's Picks screen (saved.tsx)
+- [x] 04-04-PLAN.md — PhotoGallery component, Restaurant detail view (restaurant/[id].tsx)
+- [x] 04-05-PLAN.md — Preferences screen, Settings screen + Express DELETE /api/v1/users/me
+- [ ] 04-06-PLAN.md — Gap closure: POST /swipes, GET /restaurants/:id, GET /recommendations, DELETE /saves/:id
 
 **UI hint**: yes
 
@@ -96,5 +97,5 @@ Plans:
 | 1. Monorepo Scaffold + Infrastructure | 0/TBD | Not started | - |
 | 2. API + Database Layer | 0/TBD | Not started | - |
 | 3. Authentication + Onboarding | 0/TBD | Not started | - |
-| 4. Swipe Core + Secondary Screens | 0/5 | Not started | - |
+| 4. Swipe Core + Secondary Screens | 5/6 | Gap closure | - |
 | 5. Push Notifications + App Store Submission | 0/TBD | Not started | - |
