@@ -16,17 +16,17 @@ The swipe feels right — 60fps, responsive, and frictionless — because a jank
 
 ### Active
 
-- [ ] Swipe card deck with 60fps animation (right = save, left = skip, up = superlike, undo)
-- [ ] Location-based restaurant feed via Google Places API (New) with field masks + geographic batching
-- [ ] Supabase backend with PostGIS spatial index and recommendation SQL function
-- [ ] Authentication: email/password + Google + Apple Sign-In
-- [ ] "Tonight's Picks" saved list (auto-populated on right-swipe via DB trigger)
-- [ ] Restaurant detail view (photos, hours, directions, rating, price level)
-- [ ] User preferences (cuisines, price range, max distance)
-- [ ] Onboarding flow (complete enough to pass App Store review)
-- [ ] Push notifications (daily 6PM reminder, weekly digest, closing-soon alerts, re-engagement)
-- [ ] Settings screen
-- [ ] Monorepo scaffold (Turborepo + pnpm, apps/mobile + apps/api + packages/shared)
+- [ ] **CORE-01**: Swipe card deck with 60fps animation (right = save, left = skip, up = superlike, undo)
+- [ ] **API-01**: Location-based restaurant feed via Google Places API (New) with field masks + geographic batching
+- [ ] **API-02**: Supabase backend with PostGIS spatial index and recommendation SQL function
+- [ ] **AUTH-01**: Authentication: email/password + Google + Apple Sign-In
+- [ ] **CORE-02**: "Tonight's Picks" saved list (auto-populated on right-swipe via DB trigger)
+- [ ] **CORE-03**: Restaurant detail view (photos, hours, directions, rating, price level)
+- [ ] **CORE-04**: User preferences (cuisines, price range, max distance)
+- [ ] **UX-01**: Onboarding flow (complete enough to pass App Store review)
+- [ ] **NOTIF-01**: Push notifications (daily 6PM reminder only — closing-soon deferred to v1.1)
+- [ ] **UX-02**: Settings screen (with account deletion — required for App Store)
+- [ ] **INFRA-01**: Monorepo scaffold (Turborepo + pnpm, apps/mobile + apps/api + packages/shared)
 
 ### Out of Scope
 
