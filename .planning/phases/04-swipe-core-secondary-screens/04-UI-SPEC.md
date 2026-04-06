@@ -46,6 +46,9 @@ Exceptions:
 - Touch targets for all action buttons (X, Heart, Star, Undo) must be minimum **44px × 44px** (Apple HIG minimum, App Store accessibility requirement). Visual button size may be smaller; use padding to achieve touch target.
 - Swipe card border radius: **16px** (not on the spacing scale — visual property).
 - Picks list row thumbnail: **64px × 64px** square (not on spacing scale — fixed dimension).
+- **12px** — thumbnail gutter (marginRight between thumbnail and text block in Picks rows). This value falls between xs (4) and sm (8) tokens and md (16); it is a fixed layout gutter for a specific image+text pattern and does not belong on the general scale.
+- **56px** — action button circle diameter (44px touch target + 12px visual padding, equally distributed). Satisfies Apple HIG touch target with a visible circular background; nearest token 48px is too small to contain a 28px icon with sufficient breathing room.
+- **80px** — swipe-to-delete reveal width and Tonight's Picks row height. The reveal width is an interaction-specific measurement (must be large enough for a trash icon + comfortable tap zone). The row height is driven by 64px thumbnail + 8px paddingVertical × 2 = 80px; this is a derived dimension, not a free-form value.
 
 ---
 
@@ -54,20 +57,20 @@ Exceptions:
 | Role | Size | Weight | Line Height | Usage |
 |------|------|--------|-------------|-------|
 | Card Name | 22px | 700 (bold) | 1.2 | Restaurant name on swipe card gradient overlay |
-| Card Metadata | 15px | 400 (regular) | 1.3 | Distance · Price level · Cuisine on card overlay |
-| Detail Heading | 24px | 700 (bold) | 1.2 | Restaurant name at top of detail info sheet |
-| Body / Label | 15px | 400 (regular) | 1.5 | Address, hours, cuisine tags, row labels in detail |
-| Section Header | 13px | 600 (semibold) | 1.2 | Section labels ("Opening Hours", "About") in detail sheet |
-| Action Label | 13px | 600 (semibold) | 1.0 | Button labels (Get Directions, Call, Share) |
-| Overlay Label | 28px | 800 (extrabold) | 1.0 | SAVE / SKIP / SUPERLIKE drag labels |
-| Empty State Heading | 20px | 600 (semibold) | 1.3 | "You've seen everything nearby" |
-| Empty State Body | 15px | 400 (regular) | 1.5 | Supporting copy below empty state heading |
-| Tab Label | 11px | 400 (regular) | 1.0 | Bottom tab bar labels |
+| Card Metadata | 16px | 400 (regular) | 1.3 | Distance · Price level · Cuisine on card overlay |
+| Detail Heading | 22px | 700 (bold) | 1.2 | Restaurant name at top of detail info sheet |
+| Body / Label | 16px | 400 (regular) | 1.5 | Address, hours, cuisine tags, row labels in detail |
+| Section Header | 13px | 700 (bold) | 1.2 | Section labels ("Opening Hours", "About") in detail sheet |
+| Action Label | 13px | 700 (bold) | 1.0 | Button labels (Get Directions, Call, Share) |
+| Overlay Label | 28px | 700 (bold) | 1.0 | SAVE / SKIP / SUPERLIKE drag labels |
+| Empty State Heading | 22px | 700 (bold) | 1.3 | "You've seen everything nearby" |
+| Empty State Body | 16px | 400 (regular) | 1.5 | Supporting copy below empty state heading |
+| Tab Label | 13px | 400 (regular) | 1.0 | Bottom tab bar labels |
 | Settings Row | 16px | 400 (regular) | 1.5 | Settings list item labels |
 | Destructive | 16px | 400 (regular) | 1.5 | "Delete Account" row — same size, red color only |
 
-**Declared sizes (4 values):** 11, 13, 15, 16, 20, 22, 24, 28.
-**Declared weights (3 values):** 400 (regular), 600 (semibold), 700 (bold). 800 (extrabold) is used exclusively on overlay drag labels — this is intentional for legibility during fast motion.
+**Declared sizes (4 values):** 13, 16, 22, 28.
+**Declared weights (2 values):** 400 (regular), 700 (bold).
 
 ---
 
@@ -118,7 +121,7 @@ Gradient:    expo-linear-gradient, position absolute, bottom 0, left 0, right 0
              height 160px, colors: ['transparent', 'rgba(0,0,0,0.85)']
              padding 16px (md token)
 Name text:   22px / weight 700 / white / bottom of gradient
-Metadata:    15px / weight 400 / white opacity 0.85
+Metadata:    16px / weight 400 / white opacity 0.85
              Format: "{price_level_emoji} · {primary_cuisine} · {distance}km"
              Price level emoji: $ = "•", $$ = "••", $$$ = "$$$", $$$$ = "$$$$"
 Stack visual: Cards 2 and 3 visible behind top card, scale 0.96 / 0.92, translateY 8px / 16px
@@ -128,7 +131,7 @@ Stack visual: Cards 2 and 3 visible behind top card, scale 0.96 / 0.92, translat
 
 ```
 Container:   borderWidth 3, borderRadius 8, padding 8px (sm token)
-Text:        28px / weight 800 / matching border color
+Text:        28px / weight 700 / matching border color
 SAVE:        borderColor #22c55e, color #22c55e, rotated -15 degrees (top-left placement)
 SKIP:        borderColor #ef4444, color #ef4444, rotated 15 degrees (top-right placement)
 SUPERLIKE:   borderColor #eab308, color #eab308, no rotation (top-center placement)
@@ -140,6 +143,7 @@ Appearance:  Opacity interpolated from 0 at 0px drag to 1.0 at 80px drag offset
 ```
 Layout:      Horizontal row, centered, gap 32px (xl token), marginBottom 24px (lg token)
 Button size: 56px × 56px circle background, center icon
+             (exception: 56px documented in Spacing Scale exceptions — action button circle diameter)
 Touch target: 56px satisfies 44px minimum — no extra padding needed
 X (Skip):   backgroundColor #1c1c1e, icon Ionicons "close" 28px color #ef4444
 Heart (Save): backgroundColor #1c1c1e, icon Ionicons "heart" 28px color #22c55e
@@ -154,8 +158,9 @@ Undo:       backgroundColor #1c1c1e, icon Ionicons "arrow-undo" 22px color #abab
 Layout:      Same dimensions as swipe card, borderRadius 16px
 Background:  Shimmer animation: cycle between #2c2c2e (base) and #3a3a3c (highlight)
              Shimmer duration: 1200ms loop using Reanimated withRepeat + withTiming
-Bottom area: Solid #2c2c2e block at bottom 96px (mimics gradient+text area)
-             Two placeholder bars: 120px wide × 16px, 80px wide × 12px, gap 8px, opacity 0.4
+Bottom area: Solid #2c2c2e block at bottom 64px (mimics gradient+text area)
+             (mapped from 96px → 64px, nearest 3xl token)
+             Two placeholder bars: 120px wide × 16px, 80px wide × 13px, gap 8px, opacity 0.4
 ```
 
 ### Tonight's Picks — List Row
@@ -163,12 +168,13 @@ Bottom area: Solid #2c2c2e block at bottom 96px (mimics gradient+text area)
 ```
 Layout:      Horizontal row, height 80px, paddingHorizontal 16px, paddingVertical 8px
              backgroundColor #1c1c1e
+             (height 80px: exception documented in Spacing Scale — derived from 64px thumbnail + 8px×2 padding)
 Thumbnail:   64px × 64px, borderRadius 8px, expo-image contentFit:"cover"
-             marginRight 12px
+             marginRight 12px (exception documented in Spacing Scale — thumbnail gutter)
 Superlike badge: 20px × 20px circle, backgroundColor #eab308, position absolute
-             bottom 0, right 0 on thumbnail, Ionicons "star" 12px white
+             bottom 0, right 0 on thumbnail, Ionicons "star" 13px white
 Info column: flex:1
-Name:        16px / weight 600 / white, numberOfLines 1 (truncate)
+Name:        16px / weight 700 / white, numberOfLines 1 (truncate)
 Meta row:    13px / weight 400 / #ababab — "{cuisine} · {distance}km"
 Divider:     1px borderBottom #2c2c2e at bottom of row
 ```
@@ -177,6 +183,7 @@ Divider:     1px borderBottom #2c2c2e at bottom of row
 
 ```
 Delete button: Width 80px, full row height, backgroundColor #ef4444
+               (width 80px: exception documented in Spacing Scale — swipe-to-delete reveal width)
                Ionicons "trash" 22px white, centered
                Revealed on left-swipe via ReanimatedSwipeable rightThreshold 40
 ```
@@ -198,21 +205,23 @@ Back button: Absolute top-left, safe area inset aware, 40×40 touch target
 
 ```
 Layout:      ScrollView below photo header, flex:1, backgroundColor #1c1c1e
-             paddingHorizontal 16px, paddingTop 20px
-Name:        24px / weight 700 / white, marginBottom 4px
-Rating row:  Ionicons "star" 14px #eab308 + "{rating}" 15px / 400 / white + " ({review_count})" 13px / 400 / #ababab
+             paddingHorizontal 16px, paddingTop 24px
+             (paddingTop mapped from 20px → 24px, lg token)
+Name:        22px / weight 700 / white, marginBottom 4px
+Rating row:  Ionicons "star" 14px #eab308 + "{rating}" 16px / 400 / white + " ({review_count})" 13px / 400 / #ababab
              + " · " + price_level_display + " · " + primary_cuisine
              marginBottom 16px
 Action bar:  4-button horizontal row (Directions, Call, Share, Save/Remove)
-             Each button: 60px × 56px, backgroundColor #2c2c2e, borderRadius 8px
-             Icon 22px + 11px label below, gap 4px
+             Each button: 64px × 48px, backgroundColor #2c2c2e, borderRadius 8px
+             (width mapped from 60px → 64px, nearest 3xl token; height mapped from 56px → 48px, 2xl token)
+             Icon 22px + 13px label below, gap 4px
              Directions: Ionicons "navigate" #f97316
              Call: Ionicons "call" #ababab (hidden/disabled if no phone number in Places data)
              Share: Ionicons "share-social-outline" #ababab
              Save toggle saved: Ionicons "heart" #eab308; unsaved: Ionicons "heart-outline" #ababab
-Section label: 13px / weight 600 / #ababab / uppercased, marginTop 24px marginBottom 8px
-Address:     15px / 400 / white with Ionicons "location-outline" 16px #ababab inline
-Hours:       15px / 400; open = #22c55e, closed = #ef4444, for status text; times in white
+Section label: 13px / weight 700 / #ababab / uppercased, marginTop 24px marginBottom 8px
+Address:     16px / 400 / white with Ionicons "location-outline" 16px #ababab inline
+Hours:       16px / 400; open = #22c55e, closed = #ef4444, for status text; times in white
 ```
 
 ### Empty State (deck exhaustion)
@@ -220,17 +229,18 @@ Hours:       15px / 400; open = #22c55e, closed = #ef4444, for status text; time
 ```
 Layout:      Full-screen centered column, backgroundColor #0f0f0f
              paddingHorizontal 32px
-Illustration: Ionicons "restaurant-outline" 96px #2c2c2e
-             (Use icon as illustration placeholder — no external image dependency)
+Illustration: Ionicons "restaurant-outline" 64px #2c2c2e
+             (mapped from 96px → 64px, 3xl token)
              marginBottom 24px
 Heading:     "You've seen everything nearby"
-             20px / weight 600 / white / textAlign center
+             22px / weight 700 / white / textAlign center
 Body text:   "Adjust your preferences to discover more restaurants."
-             15px / weight 400 / #ababab / textAlign center, marginTop 8px
+             16px / weight 400 / #ababab / textAlign center, marginTop 8px
 CTA button:  "Go to Preferences"
              backgroundColor #f97316, borderRadius 12px
-             paddingVertical 14px, paddingHorizontal 32px
-             16px / weight 600 / white, textAlign center
+             paddingVertical 16px, paddingHorizontal 32px
+             (paddingVertical mapped from 14px → 16px, md token)
+             16px / weight 700 / white, textAlign center
              marginTop 32px
 ```
 
@@ -238,11 +248,12 @@ CTA button:  "Go to Preferences"
 
 ```
 Layout:      Same full-screen centered column as empty state
-Illustration: Ionicons "cloud-offline-outline" 96px #2c2c2e, marginBottom 24px
+Illustration: Ionicons "cloud-offline-outline" 64px #2c2c2e, marginBottom 24px
+             (mapped from 96px → 64px, 3xl token)
 Heading:     "Couldn't load restaurants"
-             20px / weight 600 / white / textAlign center
+             22px / weight 700 / white / textAlign center
 Body text:   "Check your connection and try again."
-             15px / weight 400 / #ababab / textAlign center, marginTop 8px
+             16px / weight 400 / #ababab / textAlign center, marginTop 8px
 CTA button:  "Try Again"
              backgroundColor #f97316, same styling as empty state CTA
              marginTop 32px
@@ -254,16 +265,18 @@ CTA button:  "Try Again"
 ```
 Layout:      ScrollView, backgroundColor #0f0f0f, paddingHorizontal 16px
 Section:     Cuisine multi-select grid — 2 columns, chip-style buttons
-             Chip: paddingVertical 10px, paddingHorizontal 16px, borderRadius 20px
-             Unselected: backgroundColor #1c1c1e, border 1px #2c2c2e, text #ababab 14px / 400
-             Selected: backgroundColor #f97316 opacity 0.15, border 1px #f97316, text #f97316 14px / 600
+             Chip: paddingVertical 8px, paddingHorizontal 16px, borderRadius 20px
+             (paddingVertical changed from 10px → 8px, sm token)
+             Unselected: backgroundColor #1c1c1e, border 1px #2c2c2e, text #ababab 16px / 400
+             Selected: backgroundColor #f97316 opacity 0.15, border 1px #f97316, text #f97316 16px / 700
 Price range: Horizontal 4-button toggle ($ / $$ / $$$ / $$$$)
              Active: backgroundColor #f97316 opacity 0.15, border #f97316
              Inactive: backgroundColor #1c1c1e, border #2c2c2e
 Distance:    Slider or segmented control (3 options: 1km / 5km / 15km)
              Active segment: backgroundColor #f97316 opacity 0.15
-Save button: Full-width, backgroundColor #f97316, borderRadius 12px, height 52px
-             "Save Preferences" / 16px / weight 600 / white
+Save button: Full-width, backgroundColor #f97316, borderRadius 12px, height 48px
+             (height mapped from 52px → 48px, 2xl token)
+             "Save Preferences" / 16px / weight 700 / white
 ```
 
 ### Settings Screen
@@ -271,7 +284,8 @@ Save button: Full-width, backgroundColor #f97316, borderRadius 12px, height 52px
 ```
 Layout:      Grouped list, backgroundColor #0f0f0f
 Section groups separated by 24px gap
-Row:         backgroundColor #1c1c1e, height 52px, paddingHorizontal 16px
+Row:         backgroundColor #1c1c1e, height 48px, paddingHorizontal 16px
+             (height mapped from 52px → 48px, 2xl token)
              16px / 400 / white label + Ionicons "chevron-forward" 16px #636366 right side
              Bottom divider 1px #2c2c2e (except last row in group)
 Delete Account row:
@@ -280,7 +294,7 @@ Delete Account row:
              Tap action: show native Alert with:
                Title: "Delete Account"
                Message: "This permanently deletes your account and all saved restaurants. This cannot be undone."
-               Buttons: "Cancel" (cancel style) + "Delete" (destructive style)
+               Buttons: "Keep Account" (cancel style) + "Delete Account" (destructive style)
              On confirm: call DELETE /api/v1/users/me, then supabase.auth.signOut()
 ```
 
@@ -296,7 +310,7 @@ Tabs:        2 tabs — Discover + Tonight's Picks
 Discover:    Ionicons "compass" (inactive) / "compass" filled (active), label "Discover"
 Picks:       Ionicons "bookmark" (inactive) / "bookmark" filled (active), label "Tonight's Picks"
 Badge:       Red dot badge on Picks tab when new picks are added during session (optional, Phase 4 stretch)
-Label size:  11px (Tab Label token)
+Label size:  13px (Tab Label token)
 ```
 
 ---
@@ -391,7 +405,7 @@ Swipe threshold: library default (approximately 30% of card width).
 | State | Visual |
 |-------|--------|
 | Populated | FlatList of RestaurantRow items |
-| Empty (no saves yet) | Centered: Ionicons "bookmark-outline" 64px #2c2c2e + "No picks yet." 16px #ababab + "Swipe right on restaurants to save them." 14px #636366 |
+| Empty (no saves yet) | Centered: Ionicons "bookmark-outline" 64px #2c2c2e + "No picks yet." 16px #ababab + "Swipe right on restaurants to save them." 16px #636366 |
 | Swipe in progress | Delete button revealed at right, row translates left |
 | Delete confirmed | Row animates out (height collapses via Reanimated LayoutAnimation) |
 | Loading | 3 skeleton rows (64px height each, shimmer) |
@@ -425,7 +439,7 @@ Swipe threshold: library default (approximately 30% of card width).
 | Directions button label | "Directions" |
 | Call button label | "Call" |
 | Share button label | "Share" |
-| Save toggle: unsaved | "Save" |
+| Save toggle: unsaved | "Add to Picks" |
 | Save toggle: saved | "Saved" |
 | Undo button tooltip (accessibility) | "Undo last swipe" |
 | Preferences screen title | "Preferences" |
@@ -434,8 +448,8 @@ Swipe threshold: library default (approximately 30% of card width).
 | Delete Account row label | "Delete Account" |
 | Delete Account alert title | "Delete Account" |
 | Delete Account alert message | "This permanently deletes your account and all saved restaurants. This cannot be undone." |
-| Delete Account alert cancel | "Cancel" |
-| Delete Account alert confirm | "Delete" |
+| Delete Account alert cancel | "Keep Account" |
+| Delete Account alert confirm | "Delete Account" |
 | Superlike badge accessibility label | "Superliked" |
 | Card distance format | "{N} km away" (e.g. "0.4 km away") — use "< 0.1 km" for under 100m |
 
@@ -494,6 +508,9 @@ No third-party shadcn blocks used in this phase. Registry safety gate is not app
 | Icon library: @expo/vector-icons Ionicons | Claude's discretion | this spec |
 | Settings screen layout + Delete Account alert copy | App Store guideline 5.1.1 + Claude's discretion | 04-RESEARCH.md |
 | Tab bar: 2 tabs (Discover, Tonight's Picks) | Inferred from ROADMAP.md file structure | 04-RESEARCH.md |
+| Typography consolidation: 4 sizes (13/16/22/28), 2 weights (400/700) | Checker revision — Issue 2 | checker feedback |
+| Copywriting: "Keep Account" / "Delete Account" / "Add to Picks" | Checker revision — Issue 1 | checker feedback |
+| Spacing exceptions documented: 12px, 56px, 80px; non-tokens mapped to nearest token | Checker revision — Issue 3 | checker feedback |
 
 ---
 
