@@ -1,4 +1,5 @@
 import { useEffect, useCallback } from 'react';
+import * as Location from 'expo-location';
 import { supabase } from '../../lib/supabase';
 import { useSwipeDeckStore } from '../../stores/swipeDeckStore';
 import { SwipeDeck } from '../../components/SwipeDeck/SwipeDeck';
@@ -19,8 +20,21 @@ export function DiscoverScreen() {
     setLoading(true);
     setError(false);
     try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setError(true);
+        return;
+      }
+      const position = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+      const { latitude, longitude } = position.coords;
+
       const headers = await getAuthHeader();
-      const res = await fetch(`${API_URL}/api/v1/recommendations`, { headers });
+      const res = await fetch(
+        `${API_URL}/api/v1/recommendations?lat=${latitude}&lng=${longitude}`,
+        { headers }
+      );
       if (!res.ok) throw new Error(`API ${res.status}`);
       const data: Restaurant[] = await res.json();
       setDeck(data);
