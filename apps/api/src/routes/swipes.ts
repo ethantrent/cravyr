@@ -68,3 +68,39 @@ swipesRouter.post('/', async (req: Request & { user?: { id: string } }, res: Res
 
   res.status(201).json(data);
 });
+
+/**
+ * DELETE /api/v1/swipes/:id
+ *
+ * Removes a swipe record for the authenticated user by restaurant_id.
+ * The :id param is the restaurant_id (not the swipe record UUID), matching
+ * the client call in discover.tsx: DELETE /api/v1/swipes/${restaurant.id}
+ *
+ * SECURITY (T-04-07-03): Dual filter on restaurant_id AND user_id from JWT.
+ * A user cannot delete another user's swipe records.
+ *
+ * Returns 204 regardless of whether a row was deleted (idempotent) because
+ * the undo operation is best-effort.
+ */
+swipesRouter.delete('/:id', async (req: Request & { user?: { id: string } }, res: Response) => {
+  const userId = req.user?.id;
+  if (!userId) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+
+  const { id } = req.params;
+
+  const { error } = await supabaseAdmin
+    .from('swipes')
+    .delete()
+    .eq('restaurant_id', id)
+    .eq('user_id', userId);
+
+  if (error) {
+    res.status(500).json({ error: error.message });
+    return;
+  }
+
+  res.status(204).send();
+});
