@@ -1,0 +1,25 @@
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    # Run every 3 days at 9:00 AM UTC to prevent Supabase free-tier 7-day auto-pause
+    - cron: '0 9 */3 * *'
+  workflow_dispatch: # Manual trigger for testing
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase database
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            "${SUPABASE_URL}/rest/v1/?apikey=${SUPABASE_ANON_KEY}&limit=0")
+          echo "Supabase responded with HTTP ${HTTP_STATUS}"
+          if [ "${HTTP_STATUS}" -ne 200 ]; then
+            echo "ERROR: Supabase ping failed with status ${HTTP_STATUS}"
+            exit 1
+          fi
+          echo "Supabase keep-alive ping successful"
