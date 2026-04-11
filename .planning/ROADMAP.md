@@ -24,7 +24,13 @@
   3. The Supabase project has PostGIS enabled, schema migrations applied, and RLS policies active — a `SELECT * FROM restaurants LIMIT 1` query returns without error.
   4. A keep-alive cron is configured and confirmed to fire against the Supabase database (prevents 7-day auto-pause on free tier).
   5. Render Starter service is provisioned and a health-check endpoint (`GET /health`) on the Express API returns 200 with no cold-start spin-down.
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Supabase CLI init, remote schema capture as tracked migration
+- [ ] 01-02-PLAN.md — Express security middleware (helmet, cors, rate-limit), Render blueprint, .env.example docs
+- [ ] 01-03-PLAN.md — Mobile dev script for turbo, GitHub Actions keep-alive cron
+
 **UI hint**: no
 
 ### Phase 2: API + Database Layer
@@ -74,7 +80,7 @@ Plans:
 - [x] 04-04-PLAN.md — PhotoGallery component, Restaurant detail view (restaurant/[id].tsx)
 - [x] 04-05-PLAN.md — Preferences screen, Settings screen + Express DELETE /api/v1/users/me
 - [x] 04-06-PLAN.md — Gap closure: POST /swipes, GET /restaurants/:id, GET /recommendations, DELETE /saves/:id
-- [ ] 04-07-PLAN.md — Gap closure: expo-location in discover.tsx for lat/lng params, POST /saves, DELETE /swipes/:id
+- [x] 04-07-PLAN.md — Gap closure: expo-location in discover.tsx for lat/lng params, POST /saves, DELETE /swipes/:id
 
 **UI hint**: yes
 
@@ -95,7 +101,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Monorepo Scaffold + Infrastructure | 0/TBD | Not started | - |
+| 1. Monorepo Scaffold + Infrastructure | 0/3 | Planned | - |
 | 2. API + Database Layer | 0/TBD | Not started | - |
 | 3. Authentication + Onboarding | 0/TBD | Not started | - |
 | 4. Swipe Core + Secondary Screens | 6/7 | Gap closure | - |
