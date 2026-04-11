@@ -1,4 +1,8 @@
+import 'dotenv/config';
 import express from 'express';
+import helmet from 'helmet';
+import cors from 'cors';
+import rateLimit from 'express-rate-limit';
 import { usersRouter } from './routes/users';
 import { swipesRouter } from './routes/swipes';
 import { restaurantsRouter } from './routes/restaurants';
@@ -8,7 +12,26 @@ import { savesRouter } from './routes/saves';
 const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
-// Middleware
+// Security headers — disable CSP in development for Expo DevClient compatibility
+app.use(helmet({
+  contentSecurityPolicy: process.env.NODE_ENV === 'production',
+}));
+
+// CORS — allow requests from mobile app
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+}));
+
+// Rate limiting — 100 requests per 15 minutes per IP
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 100,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+}));
+
+// Body parsing
 app.use(express.json());
 
 // Health check — used by UptimeRobot to prevent Render cold starts
