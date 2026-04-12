@@ -46,9 +46,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Install ngeohash, Google Places API client with field mask constants, geo_cache migration
-- [ ] 02-02-PLAN.md — Geohash cache orchestration service, nearby/detail/photo restaurant endpoints
-- [ ] 02-03-PLAN.md — Environment config finalization, Google Cloud billing alert verification
+- [x] 02-01-PLAN.md — Install ngeohash, Google Places API client with field mask constants, geo_cache migration
+- [x] 02-02-PLAN.md — Geohash cache orchestration service, nearby/detail/photo restaurant endpoints
+- [x] 02-03-PLAN.md — Environment config finalization, Google Cloud billing alert verification
 
 **UI hint**: no
 
@@ -107,8 +107,8 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Monorepo Scaffold + Infrastructure | 0/3 | Planned | - |
-| 2. API + Database Layer | 0/3 | Planned | - |
+| 1. Monorepo Scaffold + Infrastructure | 3/3 | Complete | 2026-04-10 |
+| 2. API + Database Layer | 3/3 | Complete | 2026-04-12 |
 | 3. Authentication + Onboarding | 0/TBD | Not started | - |
 | 4. Swipe Core + Secondary Screens | 6/7 | Gap closure | - |
 | 5. Push Notifications + App Store Submission | 0/TBD | Not started | - |

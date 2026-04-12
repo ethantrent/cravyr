@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-04-11T03:32:14.885Z"
+last_updated: "2026-04-12T15:00:32.995Z"
 progress:
   total_phases: 5
-  completed_phases: 1
-  total_plans: 10
-  completed_plans: 7
-  percent: 70
+  completed_phases: 3
+  total_plans: 13
+  completed_plans: 13
+  percent: 100
 ---
 
 # Project State
@@ -19,16 +19,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-06)
 
 **Core value:** 60fps swipe feel — because a janky swipe kills the product before the user finds a restaurant they love
-**Current focus:** Phase 01 — monorepo-scaffold-infrastructure
+**Current focus:** Phase 03 — authentication-onboarding
 
 ## Current Position
 
-Phase: 01 (monorepo-scaffold-infrastructure) — EXECUTING
-Plan: 1 of 3
+Phase: 02 (api-database-layer) — COMPLETE ✓
 **Milestone:** 1 — MVP
-**Phase:** 1 — Monorepo Scaffold + Infrastructure
-**Status:** Executing Phase 01
-**Progress:** ░░░░░░░░░░ 0%
+**Next phase:** Phase 03 — Authentication + Onboarding
+**Status:** Phase 02 complete. Ready to plan Phase 03.
+**Progress:** ██░░░░░░░░ 40% (2 of 5 phases complete)
 
 ## Accumulated Context
 
@@ -40,6 +39,8 @@ Plan: 1 of 3
 - Reanimated v4 (not v3 as originally assumed)
 - Express v5 (async error propagation — no try/catch needed in route handlers)
 - Zustand v5
+- FIELD_MASK_NEARBY excludes priceLevel (keeps Nearby Search on Pro tier, 5,000 free/month vs 1,000 Enterprise)
+- upsert_restaurant RPC requires SET search_path TO 'public', 'extensions' for ST_MakePoint to resolve
 
 ### Open Research Gaps
 
@@ -53,5 +54,5 @@ None
 
 ## Session Continuity
 
-Last updated: 2026-04-06 after project initialization
-Next action: /gsd-plan-phase 1
+Last updated: 2026-04-12 after Phase 02 complete
+Next action: /gsd-plan-phase 3
