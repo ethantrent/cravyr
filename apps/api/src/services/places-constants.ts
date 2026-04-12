@@ -25,7 +25,7 @@ export const PLACES_BASE = 'https://places.googleapis.com/v1';
  * caching (~50 requests/month). Kept per D-08.
  */
 export const FIELD_MASK_NEARBY =
-  'places.id,places.displayName,places.photos,places.location,places.formattedAddress,places.primaryType,places.priceLevel';
+  'places.id,places.displayName,places.photos,places.location,places.formattedAddress,places.primaryType';
 
 /**
  * Place Details field mask -- Enterprise tier.
