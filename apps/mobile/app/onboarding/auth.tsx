@@ -83,7 +83,7 @@ export default function AuthScreen() {
         } catch {
           // Preferences flush failure is non-blocking — user still gets to the app
         } finally {
-          router.replace('/(tabs)');
+          router.replace('/(tabs)/discover');
         }
       }
     });
