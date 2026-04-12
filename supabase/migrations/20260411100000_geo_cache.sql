@@ -53,7 +53,7 @@ CREATE OR REPLACE FUNCTION public.upsert_restaurant(
 RETURNS uuid
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path TO 'public', 'extensions'
 AS $$
 DECLARE
   v_id uuid;
