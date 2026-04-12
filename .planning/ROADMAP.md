@@ -62,7 +62,13 @@ Plans:
   3. User can sign in with Apple Sign-In — their full name is captured and persisted on first sign-in; a second sign-in with the same Apple account does not lose the previously saved name.
   4. New user is routed through onboarding before reaching the swipe deck: location permission prompt fires with a specific (non-generic) description string, and cuisine/price preferences are collected and saved.
   5. If location permission is denied, the app shows a graceful fallback screen (not a crash or blank screen) with instructions to enable location in Settings.
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Install auth packages, app.config.ts Google plugin, Stack.Protected auth guard, onboardingStore
+- [ ] 03-02-PLAN.md — Location soft-prompt, location-denied fallback, cuisine/price/distance preference screens
+- [ ] 03-03-PLAN.md — Auth screen (email + Google + Apple), preferences flush, human-verify checkpoint
+
 **UI hint**: yes
 
 ### Phase 4: Swipe Core + Secondary Screens
@@ -109,6 +115,6 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Monorepo Scaffold + Infrastructure | 3/3 | Complete | 2026-04-10 |
 | 2. API + Database Layer | 3/3 | Complete | 2026-04-12 |
-| 3. Authentication + Onboarding | 0/TBD | Not started | - |
+| 3. Authentication + Onboarding | 0/3 | Not started | - |
 | 4. Swipe Core + Secondary Screens | 6/7 | Gap closure | - |
 | 5. Push Notifications + App Store Submission | 0/TBD | Not started | - |
