@@ -115,6 +115,13 @@ See the full verification checklist in `.planning/phases/02-api-database-layer/0
 - TypeScript build is clean — all Phase 2 services and routes compile together
 - Blocked on Task 2 user verification before Phase 2 can be officially closed and Phase 3 can begin
 
+## Self-Check: PASSED
+
+- FOUND: `apps/api/.env.example` (updated with GOOGLE_PLACES_API_KEY uncommented)
+- FOUND: commit `79535db` (chore: document GOOGLE_PLACES_API_KEY)
+- FOUND: `.planning/phases/02-api-database-layer/02-03-SUMMARY.md`
+- TypeScript: `tsc --noEmit` exits 0
+
 ---
 *Phase: 02-api-database-layer*
 *Completed: 2026-04-12 (partial — Task 2 pending)*
