@@ -43,7 +43,13 @@ Plans:
   3. `GET /restaurants/:id` returns restaurant detail including `photo_reference` strings (not expiring photo URLs) — photo references are stored in Supabase `place_id`-keyed rows.
   4. The PostGIS `get_recommendations` SQL function executes without error and returns restaurants scored by distance + cuisine + rating + price, excluding place_ids swiped in the last 7 days.
   5. A billing alert is configured in Google Cloud at $50/day and verified to send a test notification.
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Install ngeohash, Google Places API client with field mask constants, geo_cache migration
+- [ ] 02-02-PLAN.md — Geohash cache orchestration service, nearby/detail/photo restaurant endpoints
+- [ ] 02-03-PLAN.md — Environment config finalization, Google Cloud billing alert verification
+
 **UI hint**: no
 
 ### Phase 3: Authentication + Onboarding
@@ -102,7 +108,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Monorepo Scaffold + Infrastructure | 0/3 | Planned | - |
-| 2. API + Database Layer | 0/TBD | Not started | - |
+| 2. API + Database Layer | 0/3 | Planned | - |
 | 3. Authentication + Onboarding | 0/TBD | Not started | - |
 | 4. Swipe Core + Secondary Screens | 6/7 | Gap closure | - |
 | 5. Push Notifications + App Store Submission | 0/TBD | Not started | - |
