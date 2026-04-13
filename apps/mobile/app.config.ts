@@ -9,7 +9,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   // icon: './assets/icon.png',  // TODO: add app icon
   userInterfaceStyle: 'light',
   // @ts-ignore — newArchEnabled is valid at runtime but not yet in Expo SDK 55 ExpoConfig types
-  newArchEnabled: false,
+  newArchEnabled: true,
   splash: {
     backgroundColor: '#f97316',
   },
