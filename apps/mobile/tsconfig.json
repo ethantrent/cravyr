@@ -3,13 +3,16 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@cravyr/shared": ["../../packages/shared/src/index.ts"]
+      "@cravyr/shared": [
+        "../../packages/shared/src/index.ts"
+      ]
     }
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.d.ts",
-    "expo-env.d.ts"
+    "expo-env.d.ts",
+    ".expo/types/**/*.ts"
   ]
 }

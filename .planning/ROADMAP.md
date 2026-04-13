@@ -65,7 +65,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Install auth packages, app.config.ts Google plugin, Stack.Protected auth guard, onboardingStore
+- [x] 03-01-PLAN.md — Install auth packages, app.config.ts Google plugin, Stack.Protected auth guard, onboardingStore
 - [ ] 03-02-PLAN.md — Location soft-prompt, location-denied fallback, cuisine/price/distance preference screens
 - [ ] 03-03-PLAN.md — Auth screen (email + Google + Apple), preferences flush, human-verify checkpoint
 
