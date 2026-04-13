@@ -1,0 +1,6 @@
+# Exclude locally generated native directories — EAS does a clean expo prebuild
+android/
+ios/
+
+# Exclude any local Expo cache
+.expo/
