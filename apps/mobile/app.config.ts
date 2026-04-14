@@ -10,9 +10,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   userInterfaceStyle: 'light',
   // @ts-ignore — newArchEnabled is valid at runtime but not yet in Expo SDK 55 ExpoConfig types
   newArchEnabled: true,
-  splash: {
-    backgroundColor: '#f97316',
-  },
   ios: {
     supportsTablet: false,
     bundleIdentifier: 'com.cravyr.app',
