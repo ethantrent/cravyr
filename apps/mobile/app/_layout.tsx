@@ -89,9 +89,11 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (loading) return;
-    const inOnboarding = segments[0] === 'onboarding';
+    const root = segments[0] as string | undefined;
+    const inOnboarding = root === 'onboarding';
+    const inAuthCallback = root === 'auth-callback';
 
-    if (!session && !inOnboarding) {
+    if (!session && !inOnboarding && !inAuthCallback) {
       router.replace('/onboarding');
     } else if (session && inOnboarding) {
       router.replace('/(tabs)/discover');
@@ -107,6 +109,7 @@ export default function RootLayout() {
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+      <Stack.Screen name="auth-callback" options={{ headerShown: false, title: '' }} />
       <Stack.Screen
         name="restaurant/[id]"
         options={{

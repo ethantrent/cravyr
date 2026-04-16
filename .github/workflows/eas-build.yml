@@ -1,3 +1,5 @@
+# Requires repo secret EXPO_TOKEN (https://expo.dev/accounts/[account]/settings/access-tokens).
+# Production EAS env vars EXPO_PUBLIC_SUPABASE_* must be set on expo.dev for the project.
 name: EAS Build
 
 on:

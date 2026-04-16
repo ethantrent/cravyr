@@ -1,0 +1,15 @@
+# Pings Render free-tier web service on a schedule to reduce idle spin-down frequency.
+# Does not replace a paid always-on instance.
+name: Render keepalive
+
+on:
+  schedule:
+    - cron: '0 */12 * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: GET /health
+        run: curl -fsS "https://cravyr-api.onrender.com/health" | head -c 200

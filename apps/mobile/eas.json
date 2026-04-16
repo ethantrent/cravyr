@@ -19,8 +19,7 @@
     "production": {
       "autoIncrement": true,
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://cravyr-api.onrender.com",
-        "EXPO_PUBLIC_SUPABASE_URL": "https://YOUR_PROJECT_REF.supabase.co"
+        "EXPO_PUBLIC_API_URL": "https://cravyr-api.onrender.com"
       }
     }
   },

@@ -9,6 +9,9 @@ packages/shared/**/*.tsbuildinfo
 .env.local
 .env.*.local
 
+# Play Store submit key (local only; path referenced in eas.json)
+apps/mobile/google-sa.json
+
 # Claude Code local config (project-level, not for version control)
 .claude/
 
