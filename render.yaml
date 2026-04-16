@@ -1,0 +1,30 @@
+# Render Blueprint (IaC). Dashboard: New → Blueprint → connect this repo (uses this file at repo root).
+# Docs: https://docs.render.com/docs/infrastructure-as-code
+#
+# FREE TIER ONLY — keep `plan: free`. Do not add Render Postgres or upgrade the instance here
+# (paid). Free web services spin down after idle; health checks / UptimeRobot help cold starts.
+services:
+  - type: web
+    name: cravyr-api
+    runtime: node
+    plan: free
+    region: oregon
+    numInstances: 1
+    buildCommand: pnpm install --frozen-lockfile && pnpm --filter @cravyr/shared build && pnpm --filter cravyr-api build
+    startCommand: node apps/api/dist/server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: GOOGLE_PLACES_API_KEY
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: CRON_SEND_HOUR
+        value: "23"
