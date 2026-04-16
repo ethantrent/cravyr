@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cravyr — Verifying</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #0f0f0f;
+      color: #fff;
+    }
+    .card {
+      text-align: center;
+      padding: 2rem;
+      max-width: 400px;
+    }
+    h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    p { color: #aaa; margin-bottom: 1.5rem; }
+    .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid #333;
+      border-top-color: #f97316;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    a {
+      display: inline-block;
+      background: #f97316;
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="spinner"></div>
+    <h1>Email Verified!</h1>
+    <p>Redirecting you to Cravyr...</p>
+    <a id="deepLink" href="cravyr://">Open Cravyr</a>
+  </div>
+  <script>
+    (function() {
+      var hash = window.location.hash.substring(1);
+      var params = new URLSearchParams(hash);
+      var accessToken = params.get('access_token');
+      var refreshToken = params.get('refresh_token');
+
+      var deepUrl = 'cravyr://auth-callback';
+      if (accessToken) {
+        deepUrl += '?access_token=' + encodeURIComponent(accessToken);
+        if (refreshToken) {
+          deepUrl += '&refresh_token=' + encodeURIComponent(refreshToken);
+        }
+      }
+
+      document.getElementById('deepLink').href = deepUrl;
+
+      setTimeout(function() {
+        window.location.href = deepUrl;
+      }, 1500);
+    })();
+  </script>
+</body>
+</html>

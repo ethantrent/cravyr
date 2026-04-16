@@ -2,6 +2,10 @@ import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { createClient } from '@supabase/supabase-js';
 import { requireAuth } from '../middleware/auth';
+import { validate } from '../middleware/validate';
+import { LatLngQuerySchema } from '@cravyr/shared';
+import { mapDbRowToRestaurant } from '../utils/restaurant-mapper';
+import type { DbRestaurantRow } from '../utils/restaurant-mapper';
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -28,20 +32,14 @@ recommendationsRouter.use(requireAuth);
  * SECURITY (T-04-06-04): requireAuth ensures only authenticated users get their
  * personalized deck. userId comes from req.user?.id (JWT), not query params.
  */
-recommendationsRouter.get('/', async (req: Request & { user?: { id: string } }, res: Response) => {
+recommendationsRouter.get('/', validate(LatLngQuerySchema, 'query'), async (req: Request & { user?: { id: string } }, res: Response) => {
   const userId = req.user?.id;
   if (!userId) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
 
-  const lat = parseFloat(req.query.lat as string);
-  const lng = parseFloat(req.query.lng as string);
-
-  if (isNaN(lat) || isNaN(lng)) {
-    res.status(400).json({ error: 'lat and lng query parameters are required and must be numbers' });
-    return;
-  }
+  const { lat, lng } = req.query as unknown as { lat: number; lng: number };
 
   const { data, error } = await supabase.rpc('get_restaurant_recommendations', {
     p_user_id: userId,
@@ -54,5 +52,9 @@ recommendationsRouter.get('/', async (req: Request & { user?: { id: string } }, 
     return;
   }
 
-  res.json(data ?? []);
+  const restaurants = (data ?? []).map((row: DbRestaurantRow) =>
+    mapDbRowToRestaurant(row, lat, lng),
+  );
+
+  res.json(restaurants);
 });

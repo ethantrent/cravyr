@@ -25,15 +25,27 @@ export function DiscoverScreen() {
         setError(true);
         return;
       }
-      const position = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
-      });
+
+      let position = await Location.getLastKnownPositionAsync();
+      if (!position) {
+        position = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Low,
+        });
+      }
       const { latitude, longitude } = position.coords;
 
       const headers = await getAuthHeader();
+
+      // Warm the geo-cache so restaurants exist in the DB before querying recs
+      const nearbyRes = await fetch(
+        `${API_URL}/api/v1/restaurants/nearby?lat=${latitude}&lng=${longitude}`,
+        { headers },
+      );
+      if (nearbyRes.ok) await nearbyRes.json();
+
       const res = await fetch(
         `${API_URL}/api/v1/recommendations?lat=${latitude}&lng=${longitude}`,
-        { headers }
+        { headers },
       );
       if (!res.ok) throw new Error(`API ${res.status}`);
       const data: Restaurant[] = await res.json();

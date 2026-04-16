@@ -12,6 +12,7 @@
  *   mapPlaceDetailToUpdate  - Map Enterprise fields to partial update object
  */
 
+import NodeCache from 'node-cache';
 import {
   PLACES_BASE,
   FIELD_MASK_NEARBY,
@@ -19,6 +20,9 @@ import {
   PRICE_LEVEL_MAP,
   mapPrimaryTypeToCuisines,
 } from './places-constants';
+
+// Google CDN photo URLs are valid ~24h; cache for 20h to stay safe
+const photoUrlCache = new NodeCache({ stdTTL: 72000, checkperiod: 3600 });
 
 // ---------------------------------------------------------------------------
 // Google Places API v1 response types
@@ -133,13 +137,25 @@ export async function resolvePhotoUrl(
   photoName: string,
   maxWidthPx: number = 800,
 ): Promise<string | null> {
+  const cacheKey = `${photoName}:${maxWidthPx}`;
+  const cached = photoUrlCache.get<string>(cacheKey);
+  if (cached) return cached;
+
   const url = `${PLACES_BASE}/${photoName}/media?key=${process.env.GOOGLE_PLACES_API_KEY}&maxWidthPx=${maxWidthPx}&skipHttpRedirect=true`;
 
   const response = await fetch(url);
-  if (!response.ok) return null;
+  if (!response.ok) {
+    const body = await response.text().catch(() => '');
+    console.error(`[resolvePhotoUrl] ${response.status} for name(${photoName.length}ch): ${body.substring(0, 200)}`);
+    return null;
+  }
 
   const data = (await response.json()) as { photoUri?: string };
-  return data.photoUri ?? null;
+  const photoUri = data.photoUri ?? null;
+  if (photoUri) {
+    photoUrlCache.set(cacheKey, photoUri);
+  }
+  return photoUri;
 }
 
 // ---------------------------------------------------------------------------

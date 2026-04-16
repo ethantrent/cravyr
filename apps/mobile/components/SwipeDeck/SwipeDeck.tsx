@@ -1,6 +1,6 @@
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { Swiper, type SwiperCardRefType } from 'rn-swiper-list';
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
@@ -22,6 +22,12 @@ export function SwipeDeck({ onSave, onSkip, onSuperlike, onUndo, onRetry }: Swip
   const swiperRef = useRef<SwiperCardRefType>(null);
   const router = useRouter();
   const { deck, undoStack, isLoading, hasError, isDeckEmpty } = useSwipeDeckStore();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+
+  const cardDimensions = useMemo(() => ({
+    width: screenWidth - 32,
+    height: screenHeight - 260,
+  }), [screenWidth, screenHeight]);
 
   // Prefetch next 2-3 images when index changes
   const handleIndexChange = (index: number) => {
@@ -109,6 +115,7 @@ export function SwipeDeck({ onSave, onSkip, onSuperlike, onUndo, onRetry }: Swip
           ref={swiperRef}
           data={deck}
           renderCard={(restaurant: Restaurant) => <SwipeCard restaurant={restaurant} />}
+          cardStyle={cardDimensions}
           prerenderItems={7}
           onSwipeRight={handleSwipeRight}
           onSwipeLeft={handleSwipeLeft}

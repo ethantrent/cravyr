@@ -6,17 +6,18 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   slug: 'cravyr',
   version: '0.0.1',
   orientation: 'portrait',
-  // icon: './assets/icon.png',  // TODO: add app icon
+  icon: './assets/icon.png',
   userInterfaceStyle: 'light',
   // @ts-ignore — newArchEnabled is valid at runtime but not yet in Expo SDK 55 ExpoConfig types
   newArchEnabled: true,
   splash: {
-    image: './assets/splash-icon.png',
+    image: './assets/splash.png',
     backgroundColor: '#f97316',
   },
   ios: {
     supportsTablet: false,
     bundleIdentifier: 'com.cravyr.app',
+    usesAppleSignIn: true,
     infoPlist: {
       NSLocationWhenInUseUsageDescription:
         'Cravyr uses your location to find restaurants near you and show distance information.',
@@ -24,6 +25,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   android: {
     adaptiveIcon: {
+      foregroundImage: './assets/adaptive-icon.png',
       backgroundColor: '#f97316',
     },
     package: 'com.cravyr.app',
@@ -31,6 +33,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   plugins: [
     'expo-router',
+    'expo-apple-authentication',
+    [
+      'expo-notifications',
+      {
+        icon: './assets/icon.png',
+        color: '#f97316',
+      },
+    ],
     [
       'expo-location',
       {

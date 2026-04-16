@@ -20,6 +20,10 @@ import {
   resolvePhotoUrl,
   mapPlaceDetailToUpdate,
 } from '../services/places';
+import { mapDbRowToRestaurant } from '../utils/restaurant-mapper';
+import type { DbRestaurantRow } from '../utils/restaurant-mapper';
+import { validate } from '../middleware/validate';
+import { LatLngQuerySchema } from '@cravyr/shared';
 
 // ---------------------------------------------------------------------------
 // Supabase clients
@@ -60,35 +64,21 @@ export const restaurantsRouter = Router();
 // GET /nearby -- Geohash-cached restaurant fetch
 // ---------------------------------------------------------------------------
 
-restaurantsRouter.get('/nearby', async (req: Request, res: Response) => {
-  const lat = parseFloat(req.query.lat as string);
-  const lng = parseFloat(req.query.lng as string);
-
-  if (isNaN(lat) || isNaN(lng)) {
-    res
-      .status(400)
-      .json({
-        error: 'lat and lng query parameters are required and must be numbers',
-      });
-    return;
-  }
-
-  if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-    res
-      .status(400)
-      .json({ error: 'lat must be -90 to 90, lng must be -180 to 180' });
-    return;
-  }
+restaurantsRouter.get('/nearby', validate(LatLngQuerySchema, 'query'), async (req: Request, res: Response) => {
+  const { lat, lng } = req.query as unknown as { lat: number; lng: number };
 
   const result = await getRestaurantsForLocation(lat, lng);
 
+  const restaurants = result.restaurants.map((row) =>
+    mapDbRowToRestaurant(row as DbRestaurantRow, lat, lng),
+  );
   res.json({
-    restaurants: result.restaurants,
+    restaurants,
     meta: {
       source: result.source,
       cache_only: result.cache_only ?? false,
       cache_refreshing: result.cache_refreshing ?? false,
-      count: result.restaurants.length,
+      count: restaurants.length,
     },
   });
 });
@@ -168,7 +158,7 @@ restaurantsRouter.get('/:id', async (req: Request, res: Response) => {
     return;
   }
 
-  // Check detail cache first
+  // Check detail cache first (already mapped)
   const cached = detailCache.get<Record<string, unknown>>(`restaurant:${id}`);
   if (cached) {
     res.json(cached);
@@ -192,15 +182,12 @@ restaurantsRouter.get('/:id', async (req: Request, res: Response) => {
     try {
       const detail = await getPlaceDetails(data.external_id);
       const update = mapPlaceDetailToUpdate(detail);
-      // Update DB with Enterprise fields
       await supabaseAdmin
         .from('restaurants')
         .update(update)
         .eq('id', data.id);
-      // Merge update into response
       Object.assign(data, update);
     } catch (err) {
-      // Non-fatal: serve what we have, log the error
       console.error(
         `Failed to fetch detail for ${data.external_id}:`,
         err,
@@ -208,6 +195,8 @@ restaurantsRouter.get('/:id', async (req: Request, res: Response) => {
     }
   }
 
-  detailCache.set(`restaurant:${id}`, data);
-  res.json(data);
+  const restaurant = mapDbRowToRestaurant(data as DbRestaurantRow);
+  detailCache.set(`restaurant:${id}`, restaurant);
+  res.json(restaurant);
 });
+

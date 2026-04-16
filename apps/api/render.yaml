@@ -1,17 +1,19 @@
+# Same as repo-root ../../render.yaml — kept for docs that reference apps/api/render.yaml.
+# Prefer connecting the Blueprint to the root render.yaml in the Render dashboard.
+# FREE TIER ONLY — plan: free, numInstances: 1 (do not add paid add-ons in this file).
 services:
   - type: web
     name: cravyr-api
     runtime: node
     plan: free
-    rootDir: apps/api
-    buildCommand: pnpm install && pnpm run build
-    startCommand: node dist/server.js
+    region: oregon
+    numInstances: 1
+    buildCommand: pnpm install --frozen-lockfile && pnpm --filter @cravyr/shared build && pnpm --filter cravyr-api build
+    startCommand: node apps/api/dist/server.js
     healthCheckPath: /health
     envVars:
-      - key: PORT
-        value: "3000"
       - key: NODE_ENV
-        value: "production"
+        value: production
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_ANON_KEY
@@ -22,3 +24,5 @@ services:
         sync: false
       - key: CORS_ORIGIN
         sync: false
+      - key: CRON_SEND_HOUR
+        value: "23"

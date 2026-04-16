@@ -6,11 +6,11 @@
 
 ## Phases
 
-- [ ] **Phase 1: Monorepo Scaffold + Infrastructure** — Turborepo/pnpm workspace, Supabase schema + PostGIS + RLS, Render account provisioning
-- [ ] **Phase 2: API + Database Layer** — Express v5 backend, Google Places proxy with field masks + caching, PostGIS recommendation function
-- [ ] **Phase 3: Authentication + Onboarding** — Supabase auth (email + Google + Apple), onboarding flow, Expo Router auth guard
-- [ ] **Phase 4: Swipe Core + Secondary Screens** — SwipeDeck component, swipe recording, Tonight's Picks, detail view, preferences, settings (gap closure in progress)
-- [ ] **Phase 5: Push Notifications + App Store Submission** — Expo Push, daily 6PM cron, EAS build, TestFlight, App Store submission
+- [x] **Phase 1: Monorepo Scaffold + Infrastructure** — Turborepo/pnpm workspace, Supabase schema + PostGIS + RLS, Render account provisioning
+- [x] **Phase 2: API + Database Layer** — Express v5 backend, Google Places proxy with field masks + caching, PostGIS recommendation function
+- [x] **Phase 3: Authentication + Onboarding** — Supabase auth (email + Google + Apple), onboarding flow, Expo Router auth guard
+- [x] **Phase 4: Swipe Core + Secondary Screens** — SwipeDeck component, swipe recording, Tonight's Picks, detail view, preferences, settings
+- [x] **Phase 5: Push Notifications + App Store Submission** — Expo Push, daily 6PM cron, EAS build, TestFlight, App Store submission
 
 ## Phase Details
 
@@ -27,9 +27,9 @@
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Supabase CLI init, remote schema capture as tracked migration
-- [ ] 01-02-PLAN.md — Express security middleware (helmet, cors, rate-limit), Render blueprint, .env.example docs
-- [ ] 01-03-PLAN.md — Mobile dev script for turbo, GitHub Actions keep-alive cron
+- [x] 01-01-PLAN.md — Supabase CLI init, remote schema capture as tracked migration
+- [x] 01-02-PLAN.md — Express security middleware (helmet, cors, rate-limit), Render blueprint, .env.example docs
+- [x] 01-03-PLAN.md — Mobile dev script for turbo, GitHub Actions keep-alive cron
 
 **UI hint**: no
 
@@ -66,8 +66,8 @@ Plans:
 
 Plans:
 - [x] 03-01-PLAN.md — Install auth packages, app.config.ts Google plugin, Stack.Protected auth guard, onboardingStore
-- [ ] 03-02-PLAN.md — Location soft-prompt, location-denied fallback, cuisine/price/distance preference screens
-- [ ] 03-03-PLAN.md — Auth screen (email + Google + Apple), preferences flush, human-verify checkpoint
+- [x] 03-02-PLAN.md — Location soft-prompt, location-denied fallback, cuisine/price/distance preference screens
+- [x] 03-03-PLAN.md — Auth screen (email + Google + Apple), preferences flush, human-verify checkpoint
 
 **UI hint**: yes
 
@@ -106,7 +106,13 @@ Plans:
   3. The EAS production build (`eas build --platform all --profile production`) completes without error for both iOS and Android.
   4. The TestFlight build is accessible to at least one non-developer external tester who can complete the full core loop (onboard → swipe → save a pick) without guidance.
   5. The App Store submission passes initial review (no rejection for skeleton MVP, missing Apple Sign-In, missing delete-account, or generic location permission string).
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [x] 05-01-PLAN.md — Push token table, registration endpoint, mobile token registration on foreground
+- [x] 05-02-PLAN.md — expo-server-sdk push sending service, daily 6PM reminder cron job
+- [x] 05-03-PLAN.md — EAS build verification, GitHub Actions CI pipeline, App Store pre-submission checklist
+
 **UI hint**: yes
 
 ## Progress
@@ -115,6 +121,6 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Monorepo Scaffold + Infrastructure | 3/3 | Complete | 2026-04-10 |
 | 2. API + Database Layer | 3/3 | Complete | 2026-04-12 |
-| 3. Authentication + Onboarding | 0/3 | Not started | - |
-| 4. Swipe Core + Secondary Screens | 6/7 | Gap closure | - |
-| 5. Push Notifications + App Store Submission | 0/TBD | Not started | - |
+| 3. Authentication + Onboarding | 3/3 | Complete | 2026-04-12 |
+| 4. Swipe Core + Secondary Screens | 7/7 | Complete | 2026-04-15 |
+| 5. Push Notifications + App Store Submission | 3/3 | Complete | 2026-04-15 |

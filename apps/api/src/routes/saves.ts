@@ -2,6 +2,8 @@ import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { createClient } from '@supabase/supabase-js';
 import { requireAuth } from '../middleware/auth';
+import { validate } from '../middleware/validate';
+import { SaveBodySchema } from '@cravyr/shared';
 
 const supabaseAdmin = createClient(
   process.env.SUPABASE_URL!,
@@ -27,28 +29,14 @@ savesRouter.use(requireAuth);
  * Upserts on (user_id, restaurant_id) to handle re-saving idempotently (T-04-07-05).
  * Called from restaurant/[id].tsx "Add to Picks" button.
  */
-savesRouter.post('/', async (req: Request & { user?: { id: string } }, res: Response) => {
+savesRouter.post('/', validate(SaveBodySchema, 'body'), async (req: Request & { user?: { id: string } }, res: Response) => {
   const userId = req.user?.id;
   if (!userId) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
 
-  const { restaurant_id, interaction_type = 'right' } = req.body as {
-    restaurant_id: string;
-    interaction_type?: string;
-  };
-
-  if (!restaurant_id || typeof restaurant_id !== 'string') {
-    res.status(400).json({ error: 'restaurant_id is required' });
-    return;
-  }
-
-  const validTypes = ['right', 'superlike'];
-  if (!validTypes.includes(interaction_type)) {
-    res.status(400).json({ error: 'interaction_type must be right or superlike' });
-    return;
-  }
+  const { restaurant_id, interaction_type } = req.body;
 
   const { data, error } = await supabaseAdmin
     .from('saves')

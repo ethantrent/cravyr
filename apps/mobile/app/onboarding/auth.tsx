@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -14,7 +15,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { GoogleSignin, isSuccessResponse } from '@react-native-google-signin/google-signin';
-// Apple Sign-In import intentionally omitted — requires Apple Developer account entitlements
+import * as AppleAuthentication from 'expo-apple-authentication';
 import { router } from 'expo-router';
 import { useEffect, useState, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
@@ -146,6 +147,53 @@ export default function AuthScreen() {
     }
   }
 
+  async function handleAppleSignIn() {
+    clearError();
+    setSocialLoading(true);
+    overlayOpacity.value = withTiming(1, { duration: 150 });
+    try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+
+      if (!credential.identityToken) {
+        setError('Apple Sign-In failed. No identity token received.');
+        return;
+      }
+
+      const { error: authError } = await supabase.auth.signInWithIdToken({
+        provider: 'apple',
+        token: credential.identityToken,
+      });
+
+      if (authError) {
+        setError('Sign-in failed. Please try again.');
+        return;
+      }
+
+      // Apple only returns fullName on the FIRST sign-in — persist it now or lose it forever
+      if (credential.fullName) {
+        const parts = [credential.fullName.givenName, credential.fullName.familyName]
+          .filter(Boolean);
+        if (parts.length > 0) {
+          await supabase.auth.updateUser({
+            data: { full_name: parts.join(' ') },
+          });
+        }
+      }
+    } catch (err: unknown) {
+      const code = (err as { code?: string }).code;
+      if (code === 'ERR_REQUEST_CANCELED') return;
+      setError('Sign-in failed. Please try again.');
+    } finally {
+      overlayOpacity.value = withTiming(0, { duration: 100 });
+      setSocialLoading(false);
+    }
+  }
+
   async function handleForgotPassword() {
     if (!email) {
       setError('Enter your email above, then tap "Forgot password?"');
@@ -153,7 +201,6 @@ export default function AuthScreen() {
     }
     await supabase.auth.resetPasswordForEmail(email);
     setError(null);
-    // Success is silent — Supabase sends the email; no need to show a UI state here
   }
 
   return (
@@ -284,16 +331,19 @@ export default function AuthScreen() {
           <Text style={styles.socialButtonLabel}>Continue with Google</Text>
         </TouchableOpacity>
 
-        {/* Apple Sign-In — enabled when Apple Developer account is set up */}
-        <TouchableOpacity
-          style={[styles.appleButton, { opacity: 0.4 }]}
-          disabled
-          accessibilityRole="button"
-          accessibilityLabel="Sign in with Apple — coming soon"
-        >
-          <Ionicons name="logo-apple" size={18} color="#ffffff" style={{ marginRight: 8 }} />
-          <Text style={styles.socialButtonLabel}>Sign in with Apple</Text>
-        </TouchableOpacity>
+        {/* Apple Sign-In — iOS only (required by App Store if any social login is offered) */}
+        {Platform.OS === 'ios' && (
+          <TouchableOpacity
+            style={styles.appleButton}
+            onPress={handleAppleSignIn}
+            disabled={socialLoading}
+            accessibilityRole="button"
+            accessibilityLabel="Sign in with Apple"
+          >
+            <Ionicons name="logo-apple" size={18} color="#ffffff" style={{ marginRight: 8 }} />
+            <Text style={styles.socialButtonLabel}>Sign in with Apple</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
 
       {/* Social loading overlay */}

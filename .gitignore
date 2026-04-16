@@ -1,6 +1,8 @@
 node_modules/
 .expo/
 dist/
+packages/shared/src/**/*.js
+packages/shared/**/*.tsbuildinfo
 .turbo/
 *.log
 .env

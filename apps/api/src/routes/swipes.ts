@@ -2,6 +2,8 @@ import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { createClient } from '@supabase/supabase-js';
 import { requireAuth } from '../middleware/auth';
+import { validate } from '../middleware/validate';
+import { SwipeBodySchema } from '@cravyr/shared';
 
 const supabaseAdmin = createClient(
   process.env.SUPABASE_URL!,
@@ -11,9 +13,6 @@ const supabaseAdmin = createClient(
 export const swipesRouter = Router();
 
 swipesRouter.use(requireAuth);
-
-const VALID_DIRECTIONS = ['left', 'right', 'superlike'] as const;
-type SwipeDirection = typeof VALID_DIRECTIONS[number];
 
 /**
  * POST /api/v1/swipes
@@ -30,27 +29,14 @@ type SwipeDirection = typeof VALID_DIRECTIONS[number];
  * Upserts on conflict (user_id, restaurant_id) so re-swiping the same restaurant
  * updates the direction rather than violating the unique constraint (T-04-06-05).
  */
-swipesRouter.post('/', async (req: Request & { user?: { id: string } }, res: Response) => {
+swipesRouter.post('/', validate(SwipeBodySchema, 'body'), async (req: Request & { user?: { id: string } }, res: Response) => {
   const userId = req.user?.id;
   if (!userId) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
 
-  const { restaurant_id, direction } = req.body as {
-    restaurant_id: string;
-    direction: SwipeDirection;
-  };
-
-  if (!restaurant_id || typeof restaurant_id !== 'string') {
-    res.status(400).json({ error: 'restaurant_id is required' });
-    return;
-  }
-
-  if (!VALID_DIRECTIONS.includes(direction)) {
-    res.status(400).json({ error: 'Invalid direction. Must be left, right, or superlike.' });
-    return;
-  }
+  const { restaurant_id, direction } = req.body;
 
   const { data, error } = await supabaseAdmin
     .from('swipes')

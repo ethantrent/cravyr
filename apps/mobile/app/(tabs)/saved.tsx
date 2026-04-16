@@ -52,8 +52,9 @@ export function SavedScreen() {
           interaction_type,
           saved_at,
           restaurants (
-            id, name, photo_urls, cuisines, price_level,
-            location, distance_km
+            id, external_id, name, photo_urls, cuisines, price_level,
+            rating, review_count, phone_number, hours,
+            lat, lng, address, city, state, cached_at
           )
         `)
         .eq('user_id', userId)
@@ -61,32 +62,40 @@ export function SavedScreen() {
 
       if (error) throw error;
 
-      // Map Supabase response to SavedRestaurant shape
+      const PRICE_DISPLAY = ['$', '$$', '$$$', '$$$$'] as const;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mapped: SavedRestaurant[] = (data ?? []).map((row: any) => ({
-        id: row.id,
-        user_id: userId,
-        restaurant_id: row.restaurants.id,
-        interaction_type: row.interaction_type,
-        saved_at: row.saved_at,
-        restaurant: {
-          ...row.restaurants,
-          primary_cuisine: row.restaurants.cuisines?.[0] ?? 'Restaurant',
-          price_level_display: (['•', '••', '$$$', '$$$$'] as const)[
-            (row.restaurants.price_level ?? 1) - 1
-          ],
-          distance_km: row.restaurants.distance_km ?? 0,
-          rating: row.restaurants.rating ?? 0,
-          review_count: row.restaurants.review_count ?? 0,
-          hours: row.restaurants.hours ?? null,
-          photo_urls: row.restaurants.photo_urls ?? [],
-          cached_at: row.restaurants.cached_at ?? '',
-          address: row.restaurants.address ?? '',
-          city: row.restaurants.city ?? '',
-          state: row.restaurants.state ?? '',
-          external_id: row.restaurants.external_id ?? '',
-        },
-      }));
+      const mapped: SavedRestaurant[] = (data ?? []).map((row: any) => {
+        const r = row.restaurants;
+        const cuisines = r.cuisines ?? [];
+        const pl = (r.price_level ?? 1) as 1 | 2 | 3 | 4;
+        return {
+          id: row.id,
+          user_id: userId,
+          restaurant_id: r.id,
+          interaction_type: row.interaction_type,
+          saved_at: row.saved_at,
+          restaurant: {
+            id: r.id,
+            external_id: r.external_id ?? '',
+            name: r.name,
+            location: { lat: r.lat ?? 0, lng: r.lng ?? 0 },
+            address: r.address ?? '',
+            city: r.city ?? '',
+            state: r.state ?? '',
+            photo_urls: r.photo_urls ?? [],
+            cuisines,
+            primary_cuisine: cuisines[0] ?? 'Restaurant',
+            price_level: pl,
+            price_level_display: PRICE_DISPLAY[pl - 1] ?? '$',
+            rating: r.rating ?? 0,
+            review_count: r.review_count ?? 0,
+            phone_number: r.phone_number ?? undefined,
+            hours: r.hours ?? null,
+            distance_km: 0,
+            cached_at: r.cached_at ?? '',
+          },
+        };
+      });
       setPicks(mapped);
     } catch {
       // Silent failure — empty list is acceptable fallback
