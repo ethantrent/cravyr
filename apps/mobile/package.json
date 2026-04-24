@@ -47,6 +47,7 @@
     "@babel/core": "^7.24.0",
     "@types/react": "~19.2.10",
     "patch-package": "^8.0.1",
+    "sharp": "^0.34.5",
     "typescript": "^5.3.3"
   }
 }
