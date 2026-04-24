@@ -4,7 +4,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: 'Cravyr',
   slug: 'cravyr',
-  version: '0.0.1',
+  version: '1.0.0',
   orientation: 'portrait',
   icon: './assets/icon.png',
   userInterfaceStyle: 'light',
@@ -17,10 +17,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: false,
     bundleIdentifier: 'com.cravyr.app',
+    buildNumber: '1',
     usesAppleSignIn: true,
     infoPlist: {
       NSLocationWhenInUseUsageDescription:
         'Cravyr uses your location to find restaurants near you and show distance information.',
+      ITSAppUsesNonExemptEncryption: false,
     },
   },
   android: {
@@ -29,6 +31,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       backgroundColor: '#f97316',
     },
     package: 'com.cravyr.app',
+    versionCode: 1,
     permissions: ['ACCESS_FINE_LOCATION', 'ACCESS_COARSE_LOCATION'],
   },
   plugins: [

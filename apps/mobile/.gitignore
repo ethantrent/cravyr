@@ -11,3 +11,6 @@ ios/
 
 # Throwaway icon preview candidates (produced by scripts/generate-app-icons.mjs --preview)
 assets/_preview/
+
+# Google Play service account key (generated at Google Cloud IAM; required by eas submit --platform android per eas.json:33)
+google-sa.json
