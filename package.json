@@ -8,7 +8,12 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
-    "smoke:prod": "node scripts/smoke-render.mjs"
+    "smoke:prod": "node scripts/smoke-render.mjs",
+    "prod:smoke:mobile": "node scripts/prod-smoke-mobile.mjs",
+    "prod:dashboards": "node scripts/dashboard-checklist.mjs",
+    "prod:device:uat": "node scripts/device-uat-checklist.mjs",
+    "prod:eas": "node scripts/eas-ship-readiness.mjs",
+    "prod:verify": "node scripts/prod-verify.mjs"
   },
   "devDependencies": {
     "turbo": "2.9.4"

@@ -9,7 +9,10 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "typecheck": "tsc --noEmit",
-    "tsc": "tsc --noEmit"
+    "tsc": "tsc --noEmit",
+    "eas:build:prod:android": "eas build --profile production --platform android",
+    "eas:build:prod:ios": "eas build --profile production --platform ios",
+    "eas:build:prod:all": "eas build --profile production --platform all"
   },
   "dependencies": {
     "@cravyr/shared": "workspace:*",

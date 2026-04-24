@@ -1,9 +1,16 @@
-import { View, Text, Pressable, StyleSheet, Alert } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Alert, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
+
+function privacyPolicyUrl(): string {
+  const explicit = process.env.EXPO_PUBLIC_PRIVACY_URL?.trim();
+  if (explicit) return explicit;
+  const base = (process.env.EXPO_PUBLIC_API_URL ?? 'https://cravyr-api.onrender.com').replace(/\/$/, '');
+  return base.endsWith('/privacy') ? base : `${base}/privacy`;
+}
 
 async function getAuthHeader(): Promise<Record<string, string>> {
   const { data } = await supabase.auth.getSession();
@@ -76,6 +83,15 @@ export function SettingsScreen() {
         <SettingsRow
           label="Preferences"
           onPress={() => router.push('/preferences')}
+        />
+        <SettingsRow
+          label="Privacy Policy"
+          onPress={() => {
+            const url = privacyPolicyUrl();
+            Linking.openURL(url).catch(() => {
+              Alert.alert('Error', 'Could not open the privacy policy link.');
+            });
+          }}
         />
       </View>
 
