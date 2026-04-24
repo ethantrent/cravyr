@@ -60,16 +60,16 @@ None
 | 260424-jw8 | fix app icon to 1024x1024 square | 2026-04-24 | cf634c1 | [260424-jw8-fix-app-icon-to-1024x1024-square](./quick/260424-jw8-fix-app-icon-to-1024x1024-square/) |
 | 260424-ke6 | scaffold App Store listing copy for Cravyr | 2026-04-24 | 8c1a2a7 | [260424-ke6-scaffold-app-store-listing-copy-for-crav](./quick/260424-ke6-scaffold-app-store-listing-copy-for-crav/) |
 | 260424-km4 | production submission runbook + app config validation | 2026-04-24 | 9e2089e | [260424-km4-generate-production-submission-runbook-a](./quick/260424-km4-generate-production-submission-runbook-a/) |
+| 260424-kxi | Execute automatable submission runbook steps: Supabase migrations, Render verify, app.config.ts + eas.json fixes | 2026-04-24 | d875507 | [260424-kxi-execute-automatable-submission-runbook-s](./quick/260424-kxi-execute-automatable-submission-runbook-s/) |
 
 ## Session Continuity
 
-Last updated: 2026-04-24 — Completed quick task 260424-km4: production submission runbook + config validation
-Next action: Execute SUBMISSION-RUNBOOK.md top-to-bottom (starts with Supabase migrations + Render deploy)
-Next action: Human verification — configure Apple Developer, run EAS build, submit to App Store
+Last updated: 2026-04-24 — Completed quick task 260424-kxi: automatable submission runbook steps (migrations applied, Render verified, config fixes shipped)
+Next action: Human-only remaining steps in SUBMISSION-RUNBOOK.md §1 (Apple Developer), §5 (Apple Developer portal), §6 (App Store Connect — unlocks ascAppId), §7-13
 
 ## Human Actions Required
 
-1. Apply Supabase migrations: `20260415000000_add_lat_lng_columns.sql` and `20260415100000_push_tokens.sql`
+1. ✅ Apply Supabase migrations (quick 260424-kxi — `supabase db push --yes` applied remaining migration; earlier ones already on remote)
 2. Configure Apple Developer account and enable "Sign in with Apple" capability
 3. Set `ascAppId` in `apps/mobile/eas.json` to real App Store Connect app ID
 4. Set `EXPO_TOKEN` secret in GitHub repo for CI builds
