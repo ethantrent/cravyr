@@ -53,9 +53,15 @@ Plan: 1 of 4
 
 None
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260424-jw8 | fix app icon to 1024x1024 square | 2026-04-24 | cf634c1 | [260424-jw8-fix-app-icon-to-1024x1024-square](./quick/260424-jw8-fix-app-icon-to-1024x1024-square/) |
+
 ## Session Continuity
 
-Last updated: 2026-04-15 after Phase 5 execution complete
+Last updated: 2026-04-24 — Completed quick task 260424-jw8: fix app icon to 1024x1024 square
 Next action: Human verification — configure Apple Developer, run EAS build, submit to App Store
 
 ## Human Actions Required
@@ -65,7 +71,7 @@ Next action: Human verification — configure Apple Developer, run EAS build, su
 3. Set `ascAppId` in `apps/mobile/eas.json` to real App Store Connect app ID
 4. Set `EXPO_TOKEN` secret in GitHub repo for CI builds
 5. Create and host a privacy policy page (required for App Store)
-6. Design app icon (1024x1024) and update `app.config.ts`
+6. ✅ App icon sized to 1024×1024 (quick 260424-jw8 — center crop of existing landscape; a designer-supplied high-res source is still recommended before final submission, regenerate via `node apps/mobile/scripts/generate-app-icons.mjs --source <new-source> --mode fit --out-dir apps/mobile/assets --confirm-overwrite`)
 7. Run `eas build --platform all --profile production` to verify builds
 8. Run `eas submit --platform ios` for TestFlight
 9. Capture App Store screenshots
