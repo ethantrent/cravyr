@@ -65,7 +65,7 @@ export const restaurantsRouter = Router();
 // ---------------------------------------------------------------------------
 
 restaurantsRouter.get('/nearby', validate(LatLngQuerySchema, 'query'), async (req: Request, res: Response) => {
-  const { lat, lng } = req.query as unknown as { lat: number; lng: number };
+  const { lat, lng } = res.locals.validated as { lat: number; lng: number };
 
   const result = await getRestaurantsForLocation(lat, lng);
 

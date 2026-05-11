@@ -10,6 +10,11 @@ type ParseableSchema = {
   safeParse: (data: unknown) => unknown;
 };
 
+/**
+ * Express 5 made req.query a read-only getter, so we can no longer overwrite it.
+ * Validated/coerced data is stored in res.locals.validated for route handlers.
+ * For body/params (still writable), we also update req[target] for backward compat.
+ */
 export function validate(schema: ParseableSchema, target: ValidationTarget = 'body') {
   return (req: Request, res: Response, next: NextFunction) => {
     const result = schema.safeParse(req[target]) as {
@@ -27,7 +32,12 @@ export function validate(schema: ParseableSchema, target: ValidationTarget = 'bo
       });
       return;
     }
-    req[target] = result.data;
+    // Store validated data where route handlers can access it
+    res.locals.validated = result.data;
+    // For body/params, also update req[target] for backward compat
+    if (target !== 'query') {
+      (req as Record<string, unknown>)[target] = result.data;
+    }
     next();
   };
 }

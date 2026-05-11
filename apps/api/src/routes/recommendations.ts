@@ -39,7 +39,7 @@ recommendationsRouter.get('/', validate(LatLngQuerySchema, 'query'), async (req:
     return;
   }
 
-  const { lat, lng } = req.query as unknown as { lat: number; lng: number };
+  const { lat, lng } = res.locals.validated as { lat: number; lng: number };
 
   const { data, error } = await supabase.rpc('get_restaurant_recommendations', {
     p_user_id: userId,
