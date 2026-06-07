@@ -36,7 +36,7 @@ export function validate(schema: ParseableSchema, target: ValidationTarget = 'bo
     res.locals.validated = result.data;
     // For body/params, also update req[target] for backward compat
     if (target !== 'query') {
-      (req as Record<string, unknown>)[target] = result.data;
+      (req as unknown as Record<string, unknown>)[target] = result.data;
     }
     next();
   };
