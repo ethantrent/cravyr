@@ -13,6 +13,9 @@ import { recommendationsRouter } from './routes/recommendations';
 import { resolvePhotoUrl } from './services/places';
 import { savesRouter } from './routes/saves';
 import { notificationsRouter } from './routes/notifications';
+import { connectionsRouter } from './routes/connections';
+import { matchesRouter } from './routes/matches';
+import { placesRouter } from './routes/places';
 import { startCronJobs } from './services/cron';
 import { PhotoResolveQuerySchema } from '@cravyr/shared';
 
@@ -125,6 +128,9 @@ app.use('/api/v1/restaurants', restaurantsRouter);
 app.use('/api/v1/recommendations', recommendationsRouter);
 app.use('/api/v1/saves', savesRouter);
 app.use('/api/v1/notifications', notificationsRouter);
+app.use('/api/v1/connections', connectionsRouter);
+app.use('/api/v1/matches', matchesRouter);
+app.use('/api/v1/places', placesRouter);
 
 // 404 — no route matched
 app.use((_req, res) => {

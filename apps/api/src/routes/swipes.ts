@@ -52,7 +52,38 @@ swipesRouter.post('/', validate(SwipeBodySchema, 'body'), async (req: Request & 
     return;
   }
 
-  res.status(201).json(data);
+  let matchNames: string[] = [];
+  if (direction === 'right' || direction === 'superlike') {
+    const { data: connections } = await supabaseAdmin
+      .from('connections')
+      .select('user1_id, user2_id')
+      .or(`user1_id.eq.${userId},user2_id.eq.${userId}`);
+
+    if (connections && connections.length > 0) {
+      const friendIds = connections.map(c => 
+        c.user1_id === userId ? c.user2_id : c.user1_id
+      );
+
+      const { data: friendSaves } = await supabaseAdmin
+        .from('saves')
+        .select('user_id')
+        .eq('restaurant_id', restaurant_id)
+        .in('user_id', friendIds);
+
+      if (friendSaves && friendSaves.length > 0) {
+        const matchedFriendIds = friendSaves.map(s => s.user_id);
+        
+        const { data: usersData } = await supabaseAdmin.auth.admin.listUsers();
+        if (usersData?.users) {
+          matchNames = usersData.users
+            .filter(u => matchedFriendIds.includes(u.id))
+            .map(u => u.user_metadata?.full_name || u.email?.split('@')[0] || 'A friend');
+        }
+      }
+    }
+  }
+
+  res.status(201).json({ success: true, matches: matchNames, ...data });
 });
 
 /**

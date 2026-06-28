@@ -166,6 +166,9 @@ export async function getRestaurantsForLocation(
 
     const rows = restaurants ?? [];
     geoCache.set(hash, { restaurants: rows, fetchedAt: dbCell.fetched_at });
+
+    warmNeighboringCells(hash);
+
     return { restaurants: rows, source: 'database' };
   }
 
@@ -188,6 +191,9 @@ export async function getRestaurantsForLocation(
   }
 
   const restaurants = await fetchAndCacheCell(hash, lat, lng);
+  
+  warmNeighboringCells(hash);
+  
   return { restaurants, source: 'google_places' };
 }
 
@@ -286,4 +292,54 @@ function refreshCellInBackground(
         .update({ is_refreshing: false })
         .eq('geohash', hash);
     });
+}
+
+/**
+ * Fire-and-forget background job to warm adjacent geohash cells.
+ * Checks the DB to see if neighbors have been fetched recently.
+ * If not, fetches them from Google Places to build an infinite deck.
+ */
+function warmNeighboringCells(hash: string): void {
+  const neighbors = ngeohash.neighbors(hash);
+  Promise.resolve().then(async () => {
+    for (const neighbor of neighbors) {
+      if (await isBudgetExhausted()) return;
+
+      const { data: dbCell } = await supabase
+        .from('geo_cache')
+        .select('fetched_at, is_refreshing')
+        .eq('geohash', neighbor)
+        .single();
+
+      // Don't fetch if someone else is already fetching it
+      if (dbCell?.is_refreshing) continue;
+
+      if (!dbCell || isStale(dbCell.fetched_at, 24 * 60 * 60 * 1000)) {
+        // Decode center of neighbor hash for Google Places search
+        const { latitude, longitude } = ngeohash.decode(neighbor);
+        
+        // Optimistically mark as refreshing (fire-and-forget update)
+        Promise.resolve(
+          supabase
+            .from('geo_cache')
+            .update({ is_refreshing: true })
+            .eq('geohash', neighbor)
+        ).catch(() => {});
+          
+        try {
+          await fetchAndCacheCell(neighbor, latitude, longitude);
+          await supabase
+            .from('geo_cache')
+            .update({ is_refreshing: false })
+            .eq('geohash', neighbor);
+        } catch (err) {
+          console.error(`Background warming failed for neighbor ${neighbor}:`, err);
+          await supabase
+            .from('geo_cache')
+            .update({ is_refreshing: false })
+            .eq('geohash', neighbor);
+        }
+      }
+    }
+  }).catch(console.error);
 }

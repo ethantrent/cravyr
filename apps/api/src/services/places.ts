@@ -81,7 +81,7 @@ export async function searchNearby(
       'X-Goog-FieldMask': FIELD_MASK_NEARBY,
     },
     body: JSON.stringify({
-      includedTypes: ['restaurant'],
+      includedTypes: ['restaurant', 'cafe', 'bar', 'bakery', 'meal_takeaway', 'fast_food_restaurant'],
       maxResultCount: 20,
       locationRestriction: {
         circle: {
@@ -156,6 +156,55 @@ export async function resolvePhotoUrl(
     photoUrlCache.set(cacheKey, photoUri);
   }
   return photoUri;
+}
+
+// ---------------------------------------------------------------------------
+// Search & Autocomplete
+// ---------------------------------------------------------------------------
+
+export async function autocompletePlaces(query: string): Promise<Array<{ placeId: string; description: string }>> {
+  const response = await fetch(`${PLACES_BASE}:autocomplete`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Goog-Api-Key': process.env.GOOGLE_PLACES_API_KEY!,
+    },
+    body: JSON.stringify({
+      input: query,
+      includedPrimaryTypes: ['locality', 'administrative_area_level_3'],
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Places Autocomplete error: ${response.status} ${await response.text()}`);
+  }
+
+  const data = (await response.json()) as any;
+  return (data.suggestions ?? []).map((s: any) => ({
+    placeId: s.placePrediction.placeId,
+    description: s.placePrediction.text.text,
+  }));
+}
+
+export async function getPlaceLocation(placeId: string): Promise<{ lat: number; lng: number }> {
+  // Using the new Places API field mask for location only
+  const response = await fetch(`${PLACES_BASE}/places/${placeId}`, {
+    method: 'GET',
+    headers: {
+      'X-Goog-Api-Key': process.env.GOOGLE_PLACES_API_KEY!,
+      'X-Goog-FieldMask': 'location',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Place Details error: ${response.status} ${await response.text()}`);
+  }
+
+  const data = (await response.json()) as any;
+  return {
+    lat: data.location.latitude,
+    lng: data.location.longitude,
+  };
 }
 
 // ---------------------------------------------------------------------------
