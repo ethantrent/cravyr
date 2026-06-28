@@ -3,13 +3,7 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { Restaurant } from '@cravyr/shared';
 import { useRouter } from 'expo-router';
-
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
-
-function photoProxyUrl(photoName: string | undefined): string | undefined {
-  if (!photoName || photoName.startsWith('http')) return photoName;
-  return `${API_URL}/api/v1/photos/resolve?name=${encodeURIComponent(photoName)}&maxWidth=600`;
-}
+import { photoProxyUrl } from '../../lib/api';
 
 interface SwipeCardProps {
   restaurant: Restaurant;

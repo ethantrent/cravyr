@@ -2,20 +2,13 @@ import { View, Text, Pressable, StyleSheet, Alert, Linking } from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
-
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
+import { API_URL, getAuthHeader } from '../lib/api';
 
 function privacyPolicyUrl(): string {
   const explicit = process.env.EXPO_PUBLIC_PRIVACY_URL?.trim();
   if (explicit) return explicit;
   const base = (process.env.EXPO_PUBLIC_API_URL ?? 'https://cravyr-api.onrender.com').replace(/\/$/, '');
   return base.endsWith('/privacy') ? base : `${base}/privacy`;
-}
-
-async function getAuthHeader(): Promise<Record<string, string>> {
-  const { data } = await supabase.auth.getSession();
-  const token = data.session?.access_token;
-  return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
 interface SettingsRowProps {
@@ -40,6 +33,24 @@ function SettingsRow({ label, onPress, destructive = false, showChevron = true }
 
 export function SettingsScreen() {
   const router = useRouter();
+
+  const handleSignOut = () => {
+    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Sign Out',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await supabase.auth.signOut();
+            // Root auth guard redirects to onboarding once the session clears
+          } catch {
+            Alert.alert('Error', 'Could not sign out. Please try again.');
+          }
+        },
+      },
+    ]);
+  };
 
   const handleDeleteAccount = () => {
     Alert.alert(
@@ -92,6 +103,15 @@ export function SettingsScreen() {
               Alert.alert('Error', 'Could not open the privacy policy link.');
             });
           }}
+        />
+      </View>
+
+      {/* Session */}
+      <View style={styles.sectionGroup}>
+        <SettingsRow
+          label="Sign Out"
+          onPress={handleSignOut}
+          showChevron={false}
         />
       </View>
 

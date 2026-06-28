@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  typecheck-and-lint:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build shared (API resolves compiled types from dist)
+      - name: Build shared (other packages resolve compiled types from dist)
         run: pnpm --filter @cravyr/shared build
 
       - name: Typecheck shared
@@ -32,9 +32,11 @@ jobs:
       - name: Typecheck API
         run: pnpm --filter cravyr-api typecheck
 
+      - name: Typecheck mobile
+        run: pnpm --filter cravyr-mobile typecheck
+
       - name: Build API
         run: pnpm --filter cravyr-api build
 
       - name: Run tests
         run: pnpm test
-        continue-on-error: true

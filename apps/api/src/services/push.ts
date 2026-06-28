@@ -9,15 +9,25 @@ const supabaseAdmin = createClient(
 );
 
 /**
+ * A successfully-enqueued push, pairing Expo's receipt/ticket id with the token
+ * it was sent to. Keeping the token alongside the ticket id is what lets us
+ * remove dead tokens once receipts come back.
+ */
+export interface SentTicket {
+  ticketId: string;
+  token: string;
+}
+
+/**
  * Send push notifications to a list of Expo push tokens.
  * Chunks into batches of 100 per Expo's rate limit.
- * Returns ticket IDs for receipt checking.
+ * Returns the ticket id + token pairs for receipt checking.
  */
 export async function sendPushNotifications(
   tokens: string[],
   title: string,
   body: string,
-): Promise<string[]> {
+): Promise<SentTicket[]> {
   const validTokens = tokens.filter((t) => Expo.isExpoPushToken(t));
   if (validTokens.length === 0) return [];
 
@@ -29,34 +39,43 @@ export async function sendPushNotifications(
   }));
 
   const chunks = expo.chunkPushNotifications(messages);
-  const ticketIds: string[] = [];
+  const sent: SentTicket[] = [];
 
+  // chunkPushNotifications preserves message order, and sendPushNotificationsAsync
+  // returns tickets in the same order as the chunk it was given, so we can map each
+  // ticket back to its token by position within the validTokens array.
+  let cursor = 0;
   for (const chunk of chunks) {
     try {
       const tickets: ExpoPushTicket[] =
         await expo.sendPushNotificationsAsync(chunk);
-      for (const ticket of tickets) {
-        if (ticket.status === 'ok' && ticket.id) {
-          ticketIds.push(ticket.id);
+      tickets.forEach((ticket, i) => {
+        const token = validTokens[cursor + i];
+        if (ticket.status === 'ok' && ticket.id && token) {
+          sent.push({ ticketId: ticket.id, token });
         }
-      }
+      });
     } catch (err) {
       console.error('Push send error:', err);
     }
+    cursor += chunk.length;
   }
 
-  return ticketIds;
+  return sent;
 }
 
 /**
- * Check push notification receipts and return tokens that are no longer valid.
- * Should be called ~15 minutes after sending to allow Expo to process.
+ * Check push notification receipts and delete tokens that are no longer valid
+ * (DeviceNotRegistered). Should be called ~15 minutes after sending to allow
+ * Expo to process the receipts.
  */
 export async function checkReceiptsAndCleanup(
-  ticketIds: string[],
+  sent: SentTicket[],
 ): Promise<void> {
-  if (ticketIds.length === 0) return;
+  if (sent.length === 0) return;
 
+  const tokenByTicketId = new Map(sent.map((s) => [s.ticketId, s.token]));
+  const ticketIds = sent.map((s) => s.ticketId);
   const chunks = expo.chunkPushNotificationReceiptIds(ticketIds);
   const invalidTokens: string[] = [];
 
@@ -64,14 +83,13 @@ export async function checkReceiptsAndCleanup(
     try {
       const receipts = await expo.getPushNotificationReceiptsAsync(chunk);
 
-      for (const [, receipt] of Object.entries(receipts)) {
+      for (const [receiptId, receipt] of Object.entries(receipts)) {
         if (
           receipt.status === 'error' &&
           receipt.details?.error === 'DeviceNotRegistered'
         ) {
-          // Token is invalid — mark for cleanup
-          // We don't have the token from the receipt, so we'll handle cleanup
-          // at the DB level during the next send cycle
+          const token = tokenByTicketId.get(receiptId);
+          if (token) invalidTokens.push(token);
         }
       }
     } catch (err) {

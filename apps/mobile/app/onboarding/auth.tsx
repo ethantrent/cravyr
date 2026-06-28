@@ -16,7 +16,7 @@ import Animated, {
 import { Ionicons } from '@expo/vector-icons';
 import { GoogleSignin, isSuccessResponse } from '@react-native-google-signin/google-signin';
 import * as AppleAuthentication from 'expo-apple-authentication';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { usePreferencesStore } from '../../stores/preferencesStore';
@@ -39,7 +39,11 @@ function mapAuthError(error: unknown): string {
 }
 
 export default function AuthScreen() {
-  const [mode, setMode] = useState<AuthMode>('create');
+  // Returning users reach this screen directly (bypassing onboarding); they keep
+  // their stored preferences and start on the Sign In tab.
+  const { returning } = useLocalSearchParams<{ returning?: string }>();
+  const isReturning = returning === '1';
+  const [mode, setMode] = useState<AuthMode>(isReturning ? 'signin' : 'create');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailFocused, setEmailFocused] = useState(false);
@@ -69,18 +73,22 @@ export default function AuthScreen() {
       if (event === 'SIGNED_IN' && session && !flushedRef.current) {
         flushedRef.current = true;
         try {
-          await supabase
-            .from('user_preferences')
-            .upsert(
-              {
-                user_id: session.user.id,
-                cuisines: draftCuisines,
-                price_range: draftPriceRange,
-                max_distance_km: draftMaxDistance,
-                updated_at: new Date().toISOString(),
-              },
-              { onConflict: 'user_id' }
-            );
+          // Skip the upsert for returning sign-ins so we never overwrite a
+          // user's saved preferences with onboarding defaults.
+          if (!isReturning) {
+            await supabase
+              .from('user_preferences')
+              .upsert(
+                {
+                  user_id: session.user.id,
+                  cuisines: draftCuisines,
+                  price_range: draftPriceRange,
+                  max_distance_km: draftMaxDistance,
+                  updated_at: new Date().toISOString(),
+                },
+                { onConflict: 'user_id' }
+              );
+          }
         } catch {
           // Preferences flush failure is non-blocking — user still gets to the app
         } finally {
@@ -89,7 +97,7 @@ export default function AuthScreen() {
       }
     });
     return () => subscription.unsubscribe();
-  }, [draftCuisines, draftPriceRange, draftMaxDistance]);
+  }, [draftCuisines, draftPriceRange, draftMaxDistance, isReturning]);
 
   function clearError() {
     setError(null);

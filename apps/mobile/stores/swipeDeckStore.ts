@@ -10,7 +10,6 @@ interface SwipeDeckState {
   setDeck: (deck: Restaurant[]) => void;
   pushUndo: (restaurant: Restaurant) => void;
   popUndo: () => Restaurant | undefined;
-  clearDeck: () => void;
   setLoading: (loading: boolean) => void;
   setError: (hasError: boolean) => void;
 }
@@ -30,7 +29,6 @@ export const useSwipeDeckStore = create<SwipeDeckState>()((set, get) => ({
     if (last) set((state) => ({ undoStack: state.undoStack.slice(0, -1) }));
     return last;
   },
-  clearDeck: () => set({ deck: [], undoStack: [], isDeckEmpty: false }),
   setLoading: (isLoading) => set({ isLoading }),
   setError: (hasError) => set({ hasError }),
 }));

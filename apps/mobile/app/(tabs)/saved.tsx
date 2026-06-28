@@ -1,19 +1,13 @@
-import { useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
+import { useFocusEffect } from 'expo-router';
 import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native';
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../lib/supabase';
 import { usePicksStore } from '../../stores/picksStore';
 import { RestaurantRow } from '../../components/RestaurantRow/RestaurantRow';
+import { API_URL, getAuthHeader } from '../../lib/api';
 import type { SavedRestaurant } from '@cravyr/shared';
-
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
-
-async function getAuthHeader(): Promise<Record<string, string>> {
-  const { data } = await supabase.auth.getSession();
-  const token = data.session?.access_token;
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
 
 function DeleteAction({ onPress }: { onPress: () => void }) {
   return (
@@ -104,9 +98,13 @@ export function SavedScreen() {
     }
   }, [setPicks, setLoading]);
 
-  useEffect(() => {
-    fetchPicks();
-  }, [fetchPicks]);
+  // Refetch every time the tab regains focus so picks saved via swiping on the
+  // Discover deck appear without needing an app restart.
+  useFocusEffect(
+    useCallback(() => {
+      fetchPicks();
+    }, [fetchPicks])
+  );
 
   const handleDelete = useCallback(
     async (saveId: string) => {

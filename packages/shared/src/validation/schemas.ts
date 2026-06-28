@@ -15,6 +15,8 @@ export type SaveBody = z.infer<typeof SaveBodySchema>;
 export const RegisterPushTokenSchema = z.object({
   expo_push_token: z.string().min(1),
   platform: z.enum(['ios', 'android']),
+  // IANA timezone (e.g. 'America/New_York') so reminders fire at local time.
+  timezone: z.string().min(1).max(64).optional(),
 });
 export type RegisterPushTokenBody = z.infer<typeof RegisterPushTokenSchema>;
 

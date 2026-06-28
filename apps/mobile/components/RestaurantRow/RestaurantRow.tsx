@@ -3,6 +3,7 @@ import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import type { SavedRestaurant } from '@cravyr/shared';
+import { photoProxyUrl } from '../../lib/api';
 
 interface RestaurantRowProps {
   pick: SavedRestaurant;
@@ -11,7 +12,7 @@ interface RestaurantRowProps {
 export function RestaurantRow({ pick }: RestaurantRowProps) {
   const router = useRouter();
   const { restaurant, interaction_type } = pick;
-  const photoUrl = restaurant.photo_urls[0];
+  const photoUrl = photoProxyUrl(restaurant.photo_urls[0], 200);
   const cuisine = restaurant.primary_cuisine ?? restaurant.cuisines[0] ?? 'Restaurant';
   const distance = restaurant.distance_km;
 

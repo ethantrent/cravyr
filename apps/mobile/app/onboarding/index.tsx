@@ -38,6 +38,17 @@ export default function LocationPromptScreen() {
           <Text style={styles.buttonLabel}>Allow Location</Text>
         )}
       </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.signInLink}
+        onPress={() => router.push('/onboarding/auth?returning=1')}
+        accessibilityRole="button"
+        accessibilityLabel="Already have an account? Sign in"
+      >
+        <Text style={styles.signInText}>
+          Already have an account? <Text style={styles.signInTextEmphasis}>Sign In</Text>
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -81,5 +92,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: '#ffffff',
+  },
+  signInLink: {
+    marginTop: 24,
+    paddingVertical: 8,
+  },
+  signInText: {
+    fontSize: 16,
+    fontWeight: '400',
+    color: '#ababab',
+    textAlign: 'center',
+  },
+  signInTextEmphasis: {
+    color: '#f97316',
+    fontWeight: '700',
   },
 });

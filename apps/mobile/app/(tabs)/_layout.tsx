@@ -1,7 +1,10 @@
-import { Tabs } from 'expo-router';
+import { Tabs, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { Pressable } from 'react-native';
 
 export function TabLayout() {
+  const router = useRouter();
+
   return (
     <Tabs
       screenOptions={{
@@ -13,7 +16,21 @@ export function TabLayout() {
           borderTopWidth: 1,
         },
         tabBarLabelStyle: { fontSize: 13 },
-        headerShown: false,
+        headerShown: true,
+        headerStyle: { backgroundColor: '#0f0f0f' },
+        headerTitleStyle: { color: '#ffffff' },
+        headerShadowVisible: false,
+        headerRight: () => (
+          <Pressable
+            onPress={() => router.push('/settings')}
+            accessibilityRole="button"
+            accessibilityLabel="Settings"
+            hitSlop={12}
+            style={{ paddingHorizontal: 16 }}
+          >
+            <Ionicons name="settings-outline" size={22} color="#ffffff" />
+          </Pressable>
+        ),
       }}
     >
       <Tabs.Screen

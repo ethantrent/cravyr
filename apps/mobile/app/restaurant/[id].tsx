@@ -13,20 +13,13 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useState, useEffect, useCallback } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { supabase } from '../../lib/supabase';
 import { usePicksStore } from '../../stores/picksStore';
 import { PhotoGallery } from '../../components/PhotoGallery/PhotoGallery';
+import { API_URL, getAuthHeader, photoProxyUrl } from '../../lib/api';
 import type { Restaurant } from '@cravyr/shared';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const HEADER_HEIGHT = SCREEN_HEIGHT * 0.4;
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
-
-async function getAuthHeader(): Promise<Record<string, string>> {
-  const { data } = await supabase.auth.getSession();
-  const token = data.session?.access_token;
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
 
 const openDirections = async (lat: number, lng: number, name: string) => {
   const encodedName = encodeURIComponent(name);
@@ -151,7 +144,10 @@ export function RestaurantDetailScreen() {
       {/* Photo gallery header — 40% screen height per D-09 */}
       <View style={{ height: HEADER_HEIGHT }}>
         <PhotoGallery
-          photoUrls={restaurant.photo_urls.slice(0, 5)}
+          photoUrls={restaurant.photo_urls
+            .slice(0, 5)
+            .map((name) => photoProxyUrl(name, 1200))
+            .filter((url): url is string => Boolean(url))}
           height={HEADER_HEIGHT}
           blurhash={restaurant.photo_blurhash}
         />

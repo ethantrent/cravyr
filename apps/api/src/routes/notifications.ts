@@ -32,19 +32,21 @@ notificationsRouter.post(
       return;
     }
 
-    const { expo_push_token, platform } = req.body;
+    const { expo_push_token, platform, timezone } = req.body;
+
+    const record: Record<string, unknown> = {
+      user_id: userId,
+      expo_push_token,
+      platform,
+      updated_at: new Date().toISOString(),
+    };
+    // Only set timezone when the client provides it, so older app versions that
+    // don't send it never overwrite a previously stored value.
+    if (timezone) record.timezone = timezone;
 
     const { data, error } = await supabaseAdmin
       .from('push_tokens')
-      .upsert(
-        {
-          user_id: userId,
-          expo_push_token,
-          platform,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id,platform' },
-      )
+      .upsert(record, { onConflict: 'user_id,platform' })
       .select('id')
       .single();
 

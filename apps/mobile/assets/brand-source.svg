@@ -1,0 +1,19 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Cravyr brand source. Full-bleed orange field so icon.png needs no alpha. -->
+  <rect width="1024" height="1024" fill="#f97316"/>
+  <g fill="#ffffff">
+    <!-- Fork, tilted left, crossing the spoon near the centre -->
+    <g transform="rotate(-18 512 512)">
+      <rect x="448" y="252" width="20" height="124" rx="10"/>
+      <rect x="486" y="252" width="20" height="124" rx="10"/>
+      <rect x="524" y="252" width="20" height="124" rx="10"/>
+      <rect x="448" y="356" width="96" height="40" rx="20"/>
+      <rect x="476" y="372" width="40" height="404" rx="20"/>
+    </g>
+    <!-- Spoon, tilted right -->
+    <g transform="rotate(18 512 512)">
+      <ellipse cx="556" cy="318" rx="58" ry="82"/>
+      <rect x="536" y="384" width="40" height="392" rx="20"/>
+    </g>
+  </g>
+</svg>

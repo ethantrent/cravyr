@@ -3,5 +3,6 @@ export interface PushToken {
   user_id: string;
   expo_push_token: string;
   platform: 'ios' | 'android';
+  timezone?: string | null;
   updated_at: string;
 }

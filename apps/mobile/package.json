@@ -10,6 +10,7 @@
     "ios": "expo run:ios",
     "typecheck": "tsc --noEmit",
     "tsc": "tsc --noEmit",
+    "icons:generate": "node scripts/generate-app-icons.mjs --source assets/brand-source.svg --mode fit --bg #f97316 --out-dir assets --confirm-overwrite",
     "eas:build:prod:android": "eas build --profile production --platform android",
     "eas:build:prod:ios": "eas build --profile production --platform ios",
     "eas:build:prod:all": "eas build --profile production --platform all"

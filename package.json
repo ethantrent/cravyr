@@ -16,6 +16,7 @@
     "prod:verify": "node scripts/prod-verify.mjs"
   },
   "devDependencies": {
+    "supabase": "^2.107.0",
     "turbo": "2.9.4"
   },
   "engines": {

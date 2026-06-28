@@ -4,6 +4,7 @@ import { Platform, AppState } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import { API_URL } from '../lib/api';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Notifications from 'expo-notifications';
 import { ErrorBoundary } from '../components/ErrorBoundary';
@@ -20,7 +21,6 @@ Notifications.setNotificationHandler({
   }),
 });
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
 const EAS_PROJECT_ID = 'e6d2a650-fd20-4092-a4a5-0f7a211e1e1a';
 
 async function registerPushToken(session: Session) {
@@ -33,6 +33,13 @@ async function registerPushToken(session: Session) {
       projectId: EAS_PROJECT_ID,
     });
 
+    let timezone: string | undefined;
+    try {
+      timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    } catch {
+      // Intl unavailable — server falls back to its default UTC send hour
+    }
+
     const token = session.access_token;
     await fetch(`${API_URL}/api/v1/notifications/register`, {
       method: 'POST',
@@ -43,6 +50,7 @@ async function registerPushToken(session: Session) {
       body: JSON.stringify({
         expo_push_token: tokenData.data,
         platform: Platform.OS,
+        timezone,
       }),
     });
   } catch {

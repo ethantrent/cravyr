@@ -5,11 +5,15 @@ interface PreferencesState {
   preferences: UserPreferences | null;
   isLoading: boolean;
   isSaving: boolean;
+  // Bumped whenever preferences are explicitly saved, so the Discover deck
+  // knows to refetch recommendations the next time it gains focus.
+  preferencesVersion: number;
   // Local draft state for the Preferences screen form
   draftCuisines: string[];
   draftPriceRange: Array<1 | 2 | 3 | 4>;
   draftMaxDistance: 1 | 5 | 15;
   setPreferences: (prefs: UserPreferences) => void;
+  bumpPreferencesVersion: () => void;
   setDraftCuisines: (cuisines: string[]) => void;
   toggleDraftCuisine: (cuisine: string) => void;
   setDraftPriceRange: (range: Array<1 | 2 | 3 | 4>) => void;
@@ -24,6 +28,7 @@ export const usePreferencesStore = create<PreferencesState>()((set, get) => ({
   preferences: null,
   isLoading: false,
   isSaving: false,
+  preferencesVersion: 0,
   draftCuisines: [],
   draftPriceRange: [1, 2, 3, 4],
   draftMaxDistance: 5,
@@ -34,6 +39,8 @@ export const usePreferencesStore = create<PreferencesState>()((set, get) => ({
       draftPriceRange: preferences.price_range,
       draftMaxDistance: preferences.max_distance_km,
     }),
+  bumpPreferencesVersion: () =>
+    set((state) => ({ preferencesVersion: state.preferencesVersion + 1 })),
   setDraftCuisines: (draftCuisines) => set({ draftCuisines }),
   toggleDraftCuisine: (cuisine) =>
     set((state) => ({

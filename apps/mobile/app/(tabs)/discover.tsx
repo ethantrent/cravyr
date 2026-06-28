@@ -1,20 +1,39 @@
-import { useEffect, useCallback } from 'react';
+import { useCallback, useRef } from 'react';
+import { useFocusEffect } from 'expo-router';
 import * as Location from 'expo-location';
-import { supabase } from '../../lib/supabase';
 import { useSwipeDeckStore } from '../../stores/swipeDeckStore';
+import { usePicksStore } from '../../stores/picksStore';
+import { usePreferencesStore } from '../../stores/preferencesStore';
 import { SwipeDeck } from '../../components/SwipeDeck/SwipeDeck';
-import type { Restaurant } from '@cravyr/shared';
+import { API_URL, getAuthHeader } from '../../lib/api';
+import type { Restaurant, SavedRestaurant } from '@cravyr/shared';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
+// Build a transient pick so a saved restaurant shows up immediately. The
+// authoritative record (with the real saves.id) replaces it when the Tonight's
+// Picks tab refetches on focus.
+function optimisticPickId(restaurantId: string): string {
+  return `optimistic-${restaurantId}`;
+}
 
-async function getAuthHeader(): Promise<Record<string, string>> {
-  const { data } = await supabase.auth.getSession();
-  const token = data.session?.access_token;
-  return token ? { Authorization: `Bearer ${token}` } : {};
+function buildOptimisticPick(
+  restaurant: Restaurant,
+  interaction: 'right' | 'superlike'
+): SavedRestaurant {
+  return {
+    id: optimisticPickId(restaurant.id),
+    user_id: '',
+    restaurant_id: restaurant.id,
+    interaction_type: interaction,
+    saved_at: new Date().toISOString(),
+    restaurant,
+  };
 }
 
 export function DiscoverScreen() {
   const { setDeck, setLoading, setError, pushUndo, popUndo } = useSwipeDeckStore();
+  const { addPick, removePick } = usePicksStore();
+  const preferencesVersion = usePreferencesStore((s) => s.preferencesVersion);
+  const lastFetchedVersion = useRef<number | null>(null);
 
   const fetchDeck = useCallback(async () => {
     setLoading(true);
@@ -57,9 +76,16 @@ export function DiscoverScreen() {
     }
   }, [setDeck, setLoading, setError]);
 
-  useEffect(() => {
-    fetchDeck();
-  }, [fetchDeck]);
+  // Fetch on first focus, then again only when preferences change — keeps Places
+  // API usage down while ensuring an edited filter set reloads the deck.
+  useFocusEffect(
+    useCallback(() => {
+      if (lastFetchedVersion.current !== preferencesVersion) {
+        lastFetchedVersion.current = preferencesVersion;
+        fetchDeck();
+      }
+    }, [preferencesVersion, fetchDeck])
+  );
 
   const recordSwipe = async (
     restaurantId: string,
@@ -83,9 +109,10 @@ export function DiscoverScreen() {
   const handleSave = useCallback(
     async (restaurant: Restaurant) => {
       pushUndo(restaurant);
+      addPick(buildOptimisticPick(restaurant, 'right'));
       await recordSwipe(restaurant.id, 'right');
     },
-    [pushUndo]
+    [pushUndo, addPick]
   );
 
   const handleSkip = useCallback(
@@ -99,14 +126,17 @@ export function DiscoverScreen() {
   const handleSuperlike = useCallback(
     async (restaurant: Restaurant) => {
       pushUndo(restaurant);
+      addPick(buildOptimisticPick(restaurant, 'superlike'));
       await recordSwipe(restaurant.id, 'superlike');
     },
-    [pushUndo]
+    [pushUndo, addPick]
   );
 
   const handleUndo = useCallback(async () => {
     const restaurant = popUndo();
     if (!restaurant) return;
+    // Roll back the optimistic pick (no-op for skips, which never added one)
+    removePick(optimisticPickId(restaurant.id));
     // Per Pitfall 5 in RESEARCH.md: delete the swipe record so recommendation engine re-includes it
     try {
       const headers = await getAuthHeader();
@@ -117,7 +147,7 @@ export function DiscoverScreen() {
     } catch {
       // Non-fatal
     }
-  }, [popUndo]);
+  }, [popUndo, removePick]);
 
   return (
     <SwipeDeck

@@ -36,6 +36,7 @@ export function PreferencesScreen() {
     setDraftMaxDistance,
     setPreferences,
     setSaving,
+    bumpPreferencesVersion,
   } = usePreferencesStore();
 
   const [didSave, setDidSave] = useState(false);
@@ -87,6 +88,8 @@ export function PreferencesScreen() {
       if (error) throw error;
 
       setPreferences(prefs);
+      // Signal the Discover deck to refetch recommendations on next focus
+      bumpPreferencesVersion();
       setDidSave(true);
       setTimeout(() => setDidSave(false), 2000);
     } catch {
@@ -94,7 +97,14 @@ export function PreferencesScreen() {
     } finally {
       setSaving(false);
     }
-  }, [draftCuisines, draftPriceRange, draftMaxDistance, setPreferences, setSaving]);
+  }, [
+    draftCuisines,
+    draftPriceRange,
+    draftMaxDistance,
+    setPreferences,
+    setSaving,
+    bumpPreferencesVersion,
+  ]);
 
   return (
     <ScrollView

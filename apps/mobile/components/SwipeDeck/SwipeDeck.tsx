@@ -9,6 +9,7 @@ import { SwipeCard } from '../SwipeCard/SwipeCard';
 import { SaveLabel, SkipLabel, SuperlikeLabel } from '../SwipeCard/OverlayLabels';
 import { CardSkeleton } from '../SwipeCard/CardSkeleton';
 import { useSwipeDeckStore } from '../../stores/swipeDeckStore';
+import { photoProxyUrl } from '../../lib/api';
 
 interface SwipeDeckProps {
   onSave: (restaurant: Restaurant) => void;
@@ -26,14 +27,15 @@ export function SwipeDeck({ onSave, onSkip, onSuperlike, onUndo, onRetry }: Swip
 
   const cardDimensions = useMemo(() => ({
     width: screenWidth - 32,
-    height: screenHeight - 260,
+    // Reserve room for the tab header, action buttons, and tab bar
+    height: screenHeight - 320,
   }), [screenWidth, screenHeight]);
 
   // Prefetch next 2-3 images when index changes
   const handleIndexChange = (index: number) => {
     const upcomingUrls = deck
       .slice(index + 1, index + 4)
-      .map((r) => r.photo_urls[0])
+      .map((r) => photoProxyUrl(r.photo_urls[0]))
       .filter((url): url is string => Boolean(url));
     if (upcomingUrls.length > 0) {
       Image.prefetch(upcomingUrls, 'memory-disk');
