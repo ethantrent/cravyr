@@ -17,3 +17,4 @@ apps/mobile/google-sa.json
 
 # Expo dynamic config stub (app.config.ts is authoritative)
 app.json
+.agents/
