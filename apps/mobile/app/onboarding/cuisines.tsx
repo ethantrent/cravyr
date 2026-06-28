@@ -8,6 +8,7 @@ import { router } from 'expo-router';
 import { CUISINE_OPTIONS } from '@cravyr/shared';
 import { usePreferencesStore } from '../../stores/preferencesStore';
 import { StepProgress } from '../../components/onboarding/StepProgress';
+import { theme } from '../../lib/theme';
 
 export default function CuisinesScreen() {
   const { draftCuisines, toggleDraftCuisine } = usePreferencesStore();
@@ -20,7 +21,7 @@ export default function CuisinesScreen() {
 
   return (
     <View style={styles.container}>
-      <StepProgress current={1} />
+      <StepProgress current={1} total={4} />
       <Text style={styles.heading}>Your cuisines</Text>
       <Text style={styles.subheading}>Pick all that interest you.</Text>
 
@@ -92,20 +93,18 @@ function CuisineChip({ label, selected, onPress }: {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f0f0f',
-    paddingHorizontal: 16,
+    backgroundColor: theme.colors.canvas,
+    paddingHorizontal: theme.spacing.base,
   },
   heading: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#ffffff',
-    marginBottom: 8,
+    ...theme.typography.displayMd,
+    color: theme.colors.ink,
+    marginBottom: theme.spacing.sm,
   },
   subheading: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: '#ababab',
-    marginBottom: 24,
+    ...theme.typography.bodyMd,
+    color: theme.colors.muted,
+    marginBottom: theme.spacing.lg,
   },
   grid: {
     paddingBottom: 16,
@@ -118,10 +117,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   chip: {
-    backgroundColor: '#1c1c1e',
+    backgroundColor: theme.colors.canvas,
     borderWidth: 1,
-    borderColor: '#2c2c2e',
-    borderRadius: 20,
+    borderColor: theme.colors.hairline,
+    borderRadius: theme.rounded.xl,
     paddingVertical: 8,
     paddingHorizontal: 16,
     alignItems: 'center',
@@ -129,21 +128,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   chipSelected: {
-    backgroundColor: 'rgba(249,115,22,0.15)',
-    borderColor: '#f97316',
+    backgroundColor: 'rgba(255,56,92,0.1)',
+    borderColor: theme.colors.primary,
   },
   chipLabel: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: '#ababab',
+    ...theme.typography.bodyMd,
+    color: theme.colors.muted,
   },
   chipLabelSelected: {
-    fontWeight: '700',
-    color: '#f97316',
+    ...theme.typography.titleSm,
+    color: theme.colors.primary,
   },
   ctaButton: {
-    backgroundColor: '#f97316',
-    borderRadius: 12,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.rounded.md,
     height: 56,
     justifyContent: 'center',
     alignItems: 'center',
@@ -151,15 +149,13 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   ctaButtonDisabled: {
-    backgroundColor: '#2c2c2e',
+    backgroundColor: theme.colors.surfaceStrong,
   },
   ctaLabel: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#ffffff',
+    ...theme.typography.buttonMd,
+    color: theme.colors.onPrimary,
   },
   ctaLabelDisabled: {
-    color: '#636366',
-    fontWeight: '400',
+    color: theme.colors.mutedSoft,
   },
 });

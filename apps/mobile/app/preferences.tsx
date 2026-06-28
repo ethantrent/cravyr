@@ -7,10 +7,13 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { usePreferencesStore } from '../stores/preferencesStore';
 import { CUISINE_OPTIONS } from '@cravyr/shared';
 import type { UserPreferences } from '@cravyr/shared';
 import { supabase } from '../lib/supabase';
+import { theme } from '../lib/theme';
 
 const PRICE_LEVELS: Array<{ level: 1 | 2 | 3 | 4; label: string }> = [
   { level: 1, label: '$' },
@@ -26,7 +29,9 @@ const DISTANCE_OPTIONS: Array<{ km: 1 | 5 | 15; label: string }> = [
 ];
 
 export function PreferencesScreen() {
+  const router = useRouter();
   const {
+    travelLocation,
     draftCuisines,
     draftPriceRange,
     draftMaxDistance,
@@ -111,6 +116,22 @@ export function PreferencesScreen() {
       style={styles.screen}
       contentContainerStyle={styles.content}
     >
+      {/* Location row */}
+      <Text style={styles.sectionLabel}>LOCATION</Text>
+      <Pressable
+        style={styles.locationRow}
+        onPress={() => router.push('/location-search')}
+        accessibilityRole="button"
+      >
+        <View style={styles.locationInfo}>
+          <Ionicons name={travelLocation ? 'airplane' : 'navigate'} size={20} color={theme.colors.primary} />
+          <Text style={styles.locationText}>
+            {travelLocation ? travelLocation.name : 'Current Location'}
+          </Text>
+        </View>
+        <Ionicons name="chevron-forward" size={16} color={theme.colors.muted} />
+      </Pressable>
+
       {/* Cuisine multi-select */}
       <Text style={styles.sectionLabel}>CUISINES</Text>
       <View style={styles.chipGrid}>
@@ -193,14 +214,35 @@ export function PreferencesScreen() {
 export default PreferencesScreen;
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#0f0f0f' },
+  screen: { flex: 1, backgroundColor: theme.colors.canvas },
   content: { paddingHorizontal: 16, paddingTop: 24, paddingBottom: 48 },
   sectionLabel: {
-    color: '#ababab',
-    fontSize: 13,
-    fontWeight: '700',
+    ...theme.typography.caption,
+    color: theme.colors.muted,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
     marginBottom: 12,
     marginTop: 24,
+  },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: theme.colors.surfaceSoft,
+    borderRadius: theme.rounded.md,
+    borderWidth: 1,
+    borderColor: theme.colors.hairline,
+  },
+  locationInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  locationText: {
+    ...theme.typography.bodyMd,
+    color: theme.colors.ink,
   },
   chipGrid: {
     flexDirection: 'row',
@@ -210,40 +252,55 @@ const styles = StyleSheet.create({
   chip: {
     paddingVertical: 8,
     paddingHorizontal: 16,
-    borderRadius: 20,
-    backgroundColor: '#1c1c1e',
+    borderRadius: theme.rounded.full,
+    backgroundColor: theme.colors.surfaceSoft,
     borderWidth: 1,
-    borderColor: '#2c2c2e',
+    borderColor: theme.colors.hairline,
   },
   chipSelected: {
-    backgroundColor: 'rgba(249,115,22,0.15)',
-    borderColor: '#f97316',
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
   },
-  chipText: { color: '#ababab', fontSize: 16, fontWeight: '400' },
-  chipTextSelected: { color: '#f97316', fontWeight: '700' },
+  chipText: { 
+    ...theme.typography.bodyMd,
+    color: theme.colors.muted,
+  },
+  chipTextSelected: { 
+    color: theme.colors.onPrimary,
+    fontWeight: '700' 
+  },
   toggleRow: { flexDirection: 'row', gap: 8 },
   toggle: {
     flex: 1,
     paddingVertical: 10,
-    borderRadius: 8,
-    backgroundColor: '#1c1c1e',
+    borderRadius: theme.rounded.md,
+    backgroundColor: theme.colors.surfaceSoft,
     borderWidth: 1,
-    borderColor: '#2c2c2e',
+    borderColor: theme.colors.hairline,
     alignItems: 'center',
   },
   toggleActive: {
-    backgroundColor: 'rgba(249,115,22,0.15)',
-    borderColor: '#f97316',
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
   },
-  toggleText: { color: '#ababab', fontSize: 16, fontWeight: '400' },
-  toggleTextActive: { color: '#f97316', fontWeight: '700' },
+  toggleText: { 
+    ...theme.typography.bodyMd,
+    color: theme.colors.muted,
+  },
+  toggleTextActive: { 
+    color: theme.colors.onPrimary,
+    fontWeight: '700' 
+  },
   saveButton: {
-    backgroundColor: '#f97316',
-    borderRadius: 12,
-    height: 48,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.rounded.md,
+    height: 56,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 32,
   },
-  saveText: { color: '#ffffff', fontSize: 16, fontWeight: '700' },
+  saveText: { 
+    ...theme.typography.buttonMd,
+    color: theme.colors.onPrimary,
+  },
 });

@@ -12,7 +12,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   newArchEnabled: true,
   splash: {
     image: './assets/splash.png',
-    backgroundColor: '#f97316',
+    backgroundColor: '#ffffff',
   },
   ios: {
     supportsTablet: false,
@@ -28,20 +28,29 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   android: {
     adaptiveIcon: {
       foregroundImage: './assets/adaptive-icon.png',
-      backgroundColor: '#f97316',
+      backgroundColor: '#ffffff',
     },
     package: 'com.cravyr.app',
     versionCode: 1,
     permissions: ['ACCESS_FINE_LOCATION', 'ACCESS_COARSE_LOCATION'],
   },
   plugins: [
+    [
+      'expo-build-properties',
+      {
+        ios: {
+          useModularHeaders: true,
+        },
+      },
+    ],
+    './plugins/withModularHeaders',
     'expo-router',
     'expo-apple-authentication',
     [
       'expo-notifications',
       {
         icon: './assets/icon.png',
-        color: '#f97316',
+        color: '#ff385c',
       },
     ],
     [

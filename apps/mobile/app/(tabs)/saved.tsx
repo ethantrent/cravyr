@@ -1,18 +1,21 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native';
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../lib/supabase';
 import { usePicksStore } from '../../stores/picksStore';
+import { useMatchesStore } from '../../stores/matchesStore';
+import { useConnectionsStore } from '../../stores/connectionsStore';
 import { RestaurantRow } from '../../components/RestaurantRow/RestaurantRow';
 import { API_URL, getAuthHeader } from '../../lib/api';
-import type { SavedRestaurant } from '@cravyr/shared';
+import { theme } from '../../lib/theme';
+import type { SavedRestaurant, Restaurant } from '@cravyr/shared';
 
 function DeleteAction({ onPress }: { onPress: () => void }) {
   return (
     <Pressable style={styles.deleteButton} onPress={onPress} accessibilityLabel="Delete pick">
-      <Ionicons name="trash" size={22} color="#ffffff" />
+      <Ionicons name="trash" size={22} color={theme.colors.onPrimary} />
     </Pressable>
   );
 }
@@ -30,7 +33,24 @@ function SkeletonRow() {
 }
 
 export function SavedScreen() {
+  const [activeTab, setActiveTab] = useState<'picks' | 'matches'>('picks');
   const { picks, isLoading, setPicks, removePick, setLoading } = usePicksStore();
+  const { matches, setMatches, isLoading: isLoadingMatches, setLoading: setLoadingMatches } = useMatchesStore();
+  const { connections, selectedFriendIds, toggleFriendSelection, fetchConnections } = useConnectionsStore((state) => ({
+    connections: state.connections,
+    selectedFriendIds: state.selectedFriendIds,
+    toggleFriendSelection: state.toggleFriendSelection,
+    fetchConnections: async () => {
+      try {
+        const headers = await getAuthHeader();
+        const res = await fetch(`${API_URL}/api/v1/connections`, { headers });
+        if (res.ok) {
+          const data = await res.json();
+          state.setConnections(data);
+        }
+      } catch {}
+    }
+  }));
 
   const fetchPicks = useCallback(async () => {
     setLoading(true);
@@ -98,13 +118,41 @@ export function SavedScreen() {
     }
   }, [setPicks, setLoading]);
 
+  const fetchMatches = useCallback(async () => {
+    if (activeTab !== 'matches') return;
+    if (selectedFriendIds.length === 0) {
+      setMatches([]);
+      return;
+    }
+    
+    setLoadingMatches(true);
+    try {
+      const headers = await getAuthHeader();
+      const params = new URLSearchParams({ friendIds: selectedFriendIds.join(',') });
+      const res = await fetch(`${API_URL}/api/v1/matches?${params.toString()}`, { headers });
+      const data = await res.json();
+      if (res.ok) {
+        setMatches(data);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setLoadingMatches(false);
+    }
+  }, [setMatches, setLoadingMatches, activeTab, selectedFriendIds]);
+
   // Refetch every time the tab regains focus so picks saved via swiping on the
   // Discover deck appear without needing an app restart.
   useFocusEffect(
     useCallback(() => {
       fetchPicks();
-    }, [fetchPicks])
+      fetchConnections();
+    }, [fetchPicks, fetchConnections])
   );
+  
+  useEffect(() => {
+    fetchMatches();
+  }, [fetchMatches]);
 
   const handleDelete = useCallback(
     async (saveId: string) => {
@@ -124,47 +172,127 @@ export function SavedScreen() {
     [removePick]
   );
 
-  if (isLoading) {
-    return (
-      <View style={styles.screen}>
-        <SkeletonRow />
-        <SkeletonRow />
-        <SkeletonRow />
-      </View>
-    );
-  }
+  const renderList = () => {
+    if (activeTab === 'picks') {
+      if (isLoading) {
+        return (
+          <>
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+          </>
+        );
+      }
+      if (picks.length === 0) {
+        return (
+          <View style={styles.emptyContainer}>
+            <Ionicons name="bookmark-outline" size={64} color={theme.colors.mutedSoft} />
+            <Text style={styles.emptyHeading}>No picks yet.</Text>
+            <Text style={styles.emptyBody}>Swipe right on restaurants to save them.</Text>
+          </View>
+        );
+      }
+      return (
+        <FlatList<SavedRestaurant>
+          data={picks}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <ReanimatedSwipeable
+              friction={2}
+              overshootRight={false}
+              rightThreshold={40}
+              renderRightActions={() => <DeleteAction onPress={() => handleDelete(item.id)} />}
+            >
+              <RestaurantRow pick={item} />
+            </ReanimatedSwipeable>
+          )}
+          contentContainerStyle={styles.listContent}
+        />
+      );
+    }
 
-  if (picks.length === 0) {
+    // Matches tab
+    if (connections.length === 0) {
+       return (
+        <View style={styles.emptyContainer}>
+          <Ionicons name="people-outline" size={64} color={theme.colors.mutedSoft} />
+          <Text style={styles.emptyHeading}>No connections yet.</Text>
+          <Text style={styles.emptyBody}>Add connections in Settings to see matches.</Text>
+        </View>
+      );
+    }
+
     return (
-      <View style={styles.emptyContainer}>
-        <Ionicons name="bookmark-outline" size={64} color="#2c2c2e" />
-        <Text style={styles.emptyHeading}>No picks yet.</Text>
-        <Text style={styles.emptyBody}>
-          Swipe right on restaurants to save them.
-        </Text>
+      <View style={styles.matchesContainer}>
+        <View style={styles.chipsContainer}>
+          <Text style={styles.chipsLabel}>Finding matches with:</Text>
+          <View style={styles.chipsScroll}>
+            {connections.map((c) => {
+              const isSelected = selectedFriendIds.includes(c.id);
+              return (
+                <Pressable
+                  key={c.id}
+                  style={[styles.chip, isSelected && styles.chipSelected]}
+                  onPress={() => toggleFriendSelection(c.id)}
+                >
+                  <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>
+                    {isSelected ? '✓ ' : ''}{c.name}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+        
+        {selectedFriendIds.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Ionicons name="chatbubbles-outline" size={64} color={theme.colors.mutedSoft} />
+            <Text style={styles.emptyHeading}>Select friends above</Text>
+            <Text style={styles.emptyBody}>Choose who you're going out with to find overlapping picks.</Text>
+          </View>
+        ) : isLoadingMatches ? (
+          <>
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+          </>
+        ) : matches.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Ionicons name="heart-outline" size={64} color={theme.colors.mutedSoft} />
+            <Text style={styles.emptyHeading}>No matches yet.</Text>
+            <Text style={styles.emptyBody}>Keep swiping together to find a match!</Text>
+          </View>
+        ) : (
+          <FlatList<Restaurant>
+            data={matches}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <RestaurantRow pick={{ id: item.id, restaurant: item } as any} />
+            )}
+            contentContainerStyle={styles.listContent}
+          />
+        )}
       </View>
     );
-  }
+  };
 
   return (
     <View style={styles.screen}>
-      <FlatList<SavedRestaurant>
-        data={picks}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <ReanimatedSwipeable
-            friction={2}
-            overshootRight={false}
-            rightThreshold={40}
-            renderRightActions={() => (
-              <DeleteAction onPress={() => handleDelete(item.id)} />
-            )}
-          >
-            <RestaurantRow pick={item} />
-          </ReanimatedSwipeable>
-        )}
-        contentContainerStyle={styles.listContent}
-      />
+      <View style={styles.segmentContainer}>
+        <Pressable
+          style={[styles.segment, activeTab === 'picks' && styles.segmentActive]}
+          onPress={() => setActiveTab('picks')}
+        >
+          <Text style={[styles.segmentText, activeTab === 'picks' && styles.segmentTextActive]}>My Picks</Text>
+        </Pressable>
+        <Pressable
+          style={[styles.segment, activeTab === 'matches' && styles.segmentActive]}
+          onPress={() => setActiveTab('matches')}
+        >
+          <Text style={[styles.segmentText, activeTab === 'matches' && styles.segmentTextActive]}>Our Matches</Text>
+        </Pressable>
+      </View>
+      {renderList()}
     </View>
   );
 }
@@ -174,35 +302,61 @@ export default SavedScreen;
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#0f0f0f',
+    backgroundColor: theme.colors.canvas,
+  },
+  segmentContainer: {
+    flexDirection: 'row',
+    margin: 16,
+    backgroundColor: theme.colors.surfaceStrong,
+    borderRadius: theme.rounded.md,
+    padding: 2,
+  },
+  segment: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: 'center',
+    borderRadius: theme.rounded.sm,
+  },
+  segmentActive: {
+    backgroundColor: theme.colors.canvas,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  segmentText: {
+    ...theme.typography.titleSm,
+    color: theme.colors.muted,
+  },
+  segmentTextActive: {
+    color: theme.colors.ink,
   },
   listContent: {
     flexGrow: 1,
   },
   emptyContainer: {
     flex: 1,
-    backgroundColor: '#0f0f0f',
+    backgroundColor: theme.colors.canvas,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 32,
   },
   emptyHeading: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '400',
+    ...theme.typography.titleMd,
+    color: theme.colors.ink,
     marginTop: 16,
   },
   emptyBody: {
-    color: '#636366',
-    fontSize: 16,
-    fontWeight: '400',
+    ...theme.typography.bodyMd,
+    color: theme.colors.muted,
     textAlign: 'center',
     marginTop: 4,
   },
   deleteButton: {
     width: 80,
     height: 80,
-    backgroundColor: '#ef4444',
+    backgroundColor: theme.colors.error,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -212,15 +366,15 @@ const styles = StyleSheet.create({
     height: 80,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: '#1c1c1e',
+    backgroundColor: theme.colors.canvas,
     borderBottomWidth: 1,
-    borderBottomColor: '#2c2c2e',
+    borderBottomColor: theme.colors.hairline,
   },
   skeletonThumbnail: {
     width: 64,
     height: 64,
-    borderRadius: 8,
-    backgroundColor: '#2c2c2e',
+    borderRadius: theme.rounded.xs,
+    backgroundColor: theme.colors.surfaceStrong,
     marginRight: 12,
   },
   skeletonInfo: {
@@ -230,13 +384,52 @@ const styles = StyleSheet.create({
   skeletonNameBar: {
     width: 120,
     height: 16,
-    backgroundColor: '#2c2c2e',
+    backgroundColor: theme.colors.surfaceStrong,
     borderRadius: 4,
   },
   skeletonMetaBar: {
     width: 80,
     height: 13,
-    backgroundColor: '#2c2c2e',
+    backgroundColor: theme.colors.surfaceStrong,
     borderRadius: 4,
+  },
+  matchesContainer: {
+    flex: 1,
+  },
+  chipsContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.hairline,
+  },
+  chipsLabel: {
+    ...theme.typography.caption,
+    color: theme.colors.muted,
+    marginBottom: 8,
+  },
+  chipsScroll: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  chip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: theme.colors.surfaceStrong,
+    borderWidth: 1,
+    borderColor: theme.colors.hairline,
+  },
+  chipSelected: {
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+  },
+  chipText: {
+    ...theme.typography.bodyMd,
+    color: theme.colors.ink,
+  },
+  chipTextSelected: {
+    color: theme.colors.onPrimary,
+    fontWeight: '600',
   },
 });

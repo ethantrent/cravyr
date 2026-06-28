@@ -7,6 +7,7 @@ import Animated, {
 import { router } from 'expo-router';
 import { usePreferencesStore } from '../../stores/preferencesStore';
 import { StepProgress } from '../../components/onboarding/StepProgress';
+import { theme } from '../../lib/theme';
 
 const DISTANCE_OPTIONS: Array<{ label: string; value: 1 | 5 | 15 }> = [
   { label: '1 km', value: 1 },
@@ -19,12 +20,12 @@ export default function DistanceScreen() {
   // Default is 5 km from preferencesStore initial state
 
   function handleContinue() {
-    router.replace('/onboarding/auth');
+    router.replace('/onboarding/location');
   }
 
   return (
     <View style={styles.container}>
-      <StepProgress current={3} />
+      <StepProgress current={3} total={4} />
       <Text style={styles.heading}>How far will you go?</Text>
       <Text style={styles.subheading}>Maximum distance from your location.</Text>
 
@@ -43,7 +44,7 @@ export default function DistanceScreen() {
         style={styles.ctaButton}
         onPress={handleContinue}
         accessibilityRole="button"
-        accessibilityLabel="Continue to account creation"
+        accessibilityLabel="Continue to location setup"
       >
         <Text style={styles.ctaLabel}>Continue</Text>
       </TouchableOpacity>
@@ -81,20 +82,18 @@ function DistanceSegment({ label, selected, onPress }: {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f0f0f',
-    paddingHorizontal: 16,
+    backgroundColor: theme.colors.canvas,
+    paddingHorizontal: theme.spacing.base,
   },
   heading: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#ffffff',
-    marginBottom: 8,
+    ...theme.typography.displayMd,
+    color: theme.colors.ink,
+    marginBottom: theme.spacing.sm,
   },
   subheading: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: '#ababab',
-    marginBottom: 24,
+    ...theme.typography.bodyMd,
+    color: theme.colors.muted,
+    marginBottom: theme.spacing.lg,
   },
   segmentRow: {
     flexDirection: 'row',
@@ -105,30 +104,29 @@ const styles = StyleSheet.create({
   },
   segment: {
     height: 56,
-    backgroundColor: '#1c1c1e',
+    backgroundColor: theme.colors.canvas,
     borderWidth: 1,
-    borderColor: '#2c2c2e',
-    borderRadius: 8,
+    borderColor: theme.colors.hairline,
+    borderRadius: theme.rounded.md,
     justifyContent: 'center',
     alignItems: 'center',
     minHeight: 44,
   },
   segmentSelected: {
-    backgroundColor: 'rgba(249,115,22,0.15)',
-    borderColor: '#f97316',
+    backgroundColor: 'rgba(255,56,92,0.1)',
+    borderColor: theme.colors.primary,
   },
   segmentLabel: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: '#ababab',
+    ...theme.typography.bodyMd,
+    color: theme.colors.muted,
   },
   segmentLabelSelected: {
-    fontWeight: '700',
-    color: '#f97316',
+    ...theme.typography.titleSm,
+    color: theme.colors.primary,
   },
   ctaButton: {
-    backgroundColor: '#f97316',
-    borderRadius: 12,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.rounded.md,
     height: 56,
     justifyContent: 'center',
     alignItems: 'center',
@@ -136,8 +134,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   ctaLabel: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#ffffff',
+    ...theme.typography.buttonMd,
+    color: theme.colors.onPrimary,
   },
 });

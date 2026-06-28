@@ -5,8 +5,12 @@ import { useSwipeDeckStore } from '../../stores/swipeDeckStore';
 import { usePicksStore } from '../../stores/picksStore';
 import { usePreferencesStore } from '../../stores/preferencesStore';
 import { SwipeDeck } from '../../components/SwipeDeck/SwipeDeck';
+import { MatchModal } from '../../components/MatchModal';
 import { API_URL, getAuthHeader } from '../../lib/api';
+import { theme } from '../../lib/theme';
 import type { Restaurant, SavedRestaurant } from '@cravyr/shared';
+import { useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 
 // Build a transient pick so a saved restaurant shows up immediately. The
 // authoritative record (with the real saves.id) replaces it when the Tonight's
@@ -30,28 +34,38 @@ function buildOptimisticPick(
 }
 
 export function DiscoverScreen() {
+  const [matchData, setMatchData] = useState<{ restaurant: Restaurant, matchNames: string[] } | null>(null);
   const { setDeck, setLoading, setError, pushUndo, popUndo } = useSwipeDeckStore();
   const { addPick, removePick } = usePicksStore();
-  const preferencesVersion = usePreferencesStore((s) => s.preferencesVersion);
+  const { preferencesVersion, travelLocation } = usePreferencesStore();
   const lastFetchedVersion = useRef<number | null>(null);
 
   const fetchDeck = useCallback(async () => {
     setLoading(true);
     setError(false);
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setError(true);
-        return;
-      }
+      let latitude: number;
+      let longitude: number;
 
-      let position = await Location.getLastKnownPositionAsync();
-      if (!position) {
-        position = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Low,
-        });
+      if (travelLocation) {
+        latitude = travelLocation.lat;
+        longitude = travelLocation.lng;
+      } else {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setError(true);
+          return;
+        }
+
+        let position = await Location.getLastKnownPositionAsync();
+        if (!position) {
+          position = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Low,
+          });
+        }
+        latitude = position.coords.latitude;
+        longitude = position.coords.longitude;
       }
-      const { latitude, longitude } = position.coords;
 
       const headers = await getAuthHeader();
 
@@ -74,7 +88,7 @@ export function DiscoverScreen() {
     } finally {
       setLoading(false);
     }
-  }, [setDeck, setLoading, setError]);
+  }, [setDeck, setLoading, setError, travelLocation]);
 
   // Fetch on first focus, then again only when preferences change — keeps Places
   // API usage down while ensuring an edited filter set reloads the deck.
@@ -96,11 +110,19 @@ export function DiscoverScreen() {
         ...(await getAuthHeader()),
         'Content-Type': 'application/json',
       };
-      await fetch(`${API_URL}/api/v1/swipes`, {
+      const res = await fetch(`${API_URL}/api/v1/swipes`, {
         method: 'POST',
         headers,
         body: JSON.stringify({ restaurant_id: restaurantId, direction }),
       });
+      const data = await res.json();
+      if (data.matches && data.matches.length > 0) {
+        // Find the restaurant from the deck or undo stack (since it was just swiped)
+        const matched = useSwipeDeckStore.getState().deck.find(r => r.id === restaurantId) || useSwipeDeckStore.getState().undoStack[0];
+        if (matched) {
+          setMatchData({ restaurant: matched, matchNames: data.matches });
+        }
+      }
     } catch {
       // Non-fatal: swipe recording failure should not interrupt UX
     }
@@ -150,14 +172,46 @@ export function DiscoverScreen() {
   }, [popUndo, removePick]);
 
   return (
-    <SwipeDeck
-      onSave={handleSave}
-      onSkip={handleSkip}
-      onSuperlike={handleSuperlike}
-      onUndo={handleUndo}
-      onRetry={fetchDeck}
-    />
+    <View style={styles.container}>
+      {travelLocation && (
+        <View style={styles.travelBanner}>
+          <Text style={styles.travelText}>Traveling in {travelLocation.name}</Text>
+        </View>
+      )}
+      <SwipeDeck
+        onSave={handleSave}
+        onSkip={handleSkip}
+        onSuperlike={handleSuperlike}
+        onUndo={handleUndo}
+        onRetry={fetchDeck}
+      />
+      <MatchModal
+        visible={matchData !== null}
+        restaurant={matchData?.restaurant || null}
+        matchNames={matchData?.matchNames || []}
+        onClose={() => setMatchData(null)}
+      />
+    </View>
   );
 }
 
 export default DiscoverScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  travelBanner: {
+    backgroundColor: theme.colors.primary,
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  travelText: {
+    ...theme.typography.caption,
+    color: theme.colors.onPrimary,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+});

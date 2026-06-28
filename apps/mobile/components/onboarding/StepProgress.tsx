@@ -1,13 +1,19 @@
 import { StyleSheet, View, Text } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { theme } from '../../lib/theme';
 
 interface StepProgressProps {
-  current: 1 | 2 | 3;
+  current: 1 | 2 | 3 | 4;
   total?: number;
 }
 
-export function StepProgress({ current, total = 3 }: StepProgressProps) {
+export function StepProgress({ current, total = 4 }: StepProgressProps) {
+  const insets = useSafeAreaInsets();
   return (
-    <View style={styles.container} accessibilityLabel={`Step ${current} of ${total}`}>
+    <View 
+      style={[styles.container, { marginTop: Math.max(insets.top + 16, 48) }]} 
+      accessibilityLabel={`Step ${current} of ${total}`}
+    >
       <View style={styles.dots}>
         {Array.from({ length: total }, (_, i) => (
           <View
@@ -23,7 +29,6 @@ export function StepProgress({ current, total = 3 }: StepProgressProps) {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 48,
     marginBottom: 32,
     alignItems: 'center',
   },
@@ -36,14 +41,13 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#2c2c2e',
+    backgroundColor: theme.colors.hairline,
   },
   dotActive: {
-    backgroundColor: '#f97316',
+    backgroundColor: theme.colors.primary,
   },
   label: {
-    fontSize: 13,
-    fontWeight: '400',
-    color: '#ababab',
+    ...theme.typography.caption,
+    color: theme.colors.mutedSoft,
   },
 });

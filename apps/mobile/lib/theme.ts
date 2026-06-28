@@ -1,0 +1,80 @@
+export const theme = {
+  colors: {
+    primary: '#ff385c', // Rausch
+    primaryActive: '#e00b41',
+    primaryDisabled: '#ffd1da',
+    ink: '#222222',
+    body: '#3f3f3f',
+    muted: '#6a6a6a',
+    mutedSoft: '#929292',
+    hairline: '#dddddd',
+    hairlineSoft: '#ebebeb',
+    canvas: '#ffffff',
+    surfaceSoft: '#f7f7f7',
+    surfaceStrong: '#f2f2f2',
+    onPrimary: '#ffffff',
+    onDark: '#ffffff',
+    error: '#c13515',
+  },
+  typography: {
+    displayLg: {
+      fontFamily: 'Inter_500Medium',
+      fontSize: 22,
+      lineHeight: 22 * 1.18,
+      letterSpacing: -0.44,
+    },
+    displayMd: {
+      fontFamily: 'Inter_700Bold',
+      fontSize: 21,
+      lineHeight: 21 * 1.43,
+    },
+    titleMd: {
+      fontFamily: 'Inter_600SemiBold',
+      fontSize: 16,
+      lineHeight: 16 * 1.25,
+    },
+    titleSm: {
+      fontFamily: 'Inter_500Medium',
+      fontSize: 16,
+      lineHeight: 16 * 1.25,
+    },
+    bodyMd: {
+      fontFamily: 'Inter_400Regular',
+      fontSize: 16,
+      lineHeight: 16 * 1.5,
+    },
+    bodySm: {
+      fontFamily: 'Inter_400Regular',
+      fontSize: 14,
+      lineHeight: 14 * 1.43,
+    },
+    caption: {
+      fontFamily: 'Inter_500Medium',
+      fontSize: 14,
+      lineHeight: 14 * 1.29,
+    },
+    buttonMd: {
+      fontFamily: 'Inter_500Medium',
+      fontSize: 16,
+      lineHeight: 16 * 1.25,
+    },
+  },
+  rounded: {
+    none: 0,
+    xs: 4,
+    sm: 8,
+    md: 14,
+    lg: 20,
+    xl: 32,
+    full: 9999,
+  },
+  spacing: {
+    xs: 4,
+    sm: 8,
+    md: 12,
+    base: 16,
+    lg: 24,
+    xl: 32,
+    section: 64,
+  },
+};

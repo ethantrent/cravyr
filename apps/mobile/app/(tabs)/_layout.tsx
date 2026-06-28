@@ -1,6 +1,7 @@
 import { Tabs, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable } from 'react-native';
+import { theme } from '../../lib/theme';
 
 export function TabLayout() {
   const router = useRouter();
@@ -8,17 +9,17 @@ export function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#f97316',
-        tabBarInactiveTintColor: '#636366',
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.muted,
         tabBarStyle: {
-          backgroundColor: '#0f0f0f',
-          borderTopColor: '#1c1c1e',
+          backgroundColor: theme.colors.canvas,
+          borderTopColor: theme.colors.hairlineSoft,
           borderTopWidth: 1,
         },
-        tabBarLabelStyle: { fontSize: 13 },
+        tabBarLabelStyle: theme.typography.caption,
         headerShown: true,
-        headerStyle: { backgroundColor: '#0f0f0f' },
-        headerTitleStyle: { color: '#ffffff' },
+        headerStyle: { backgroundColor: theme.colors.canvas },
+        headerTitleStyle: { ...theme.typography.titleMd, color: theme.colors.ink },
         headerShadowVisible: false,
         headerRight: () => (
           <Pressable
@@ -28,7 +29,7 @@ export function TabLayout() {
             hitSlop={12}
             style={{ paddingHorizontal: 16 }}
           >
-            <Ionicons name="settings-outline" size={22} color="#ffffff" />
+            <Ionicons name="settings-outline" size={22} color={theme.colors.ink} />
           </Pressable>
         ),
       }}

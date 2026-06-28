@@ -8,7 +8,7 @@ export default function OnboardingLayout() {
       <Stack.Screen name="cuisines" />
       <Stack.Screen name="price" />
       <Stack.Screen name="distance" />
-      <Stack.Screen name="auth" />
+      <Stack.Screen name="location" />
     </Stack>
   );
 }

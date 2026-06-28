@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { usePicksStore } from '../../stores/picksStore';
 import { PhotoGallery } from '../../components/PhotoGallery/PhotoGallery';
 import { API_URL, getAuthHeader, photoProxyUrl } from '../../lib/api';
+import { theme } from '../../lib/theme';
 import type { Restaurant } from '@cravyr/shared';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -31,6 +32,25 @@ const openDirections = async (lat: number, lng: number, name: string) => {
     const canOpen = await Linking.canOpenURL(url);
     if (canOpen) await Linking.openURL(url);
   }
+};
+
+const openUber = async (lat: number, lng: number, name: string) => {
+  const encodedName = encodeURIComponent(name);
+  const url = `https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]=${lat}&dropoff[longitude]=${lng}&dropoff[nickname]=${encodedName}`;
+  const canOpen = await Linking.canOpenURL(url);
+  if (canOpen) await Linking.openURL(url);
+};
+
+const openLyft = async (lat: number, lng: number) => {
+  const url = `https://lyft.com/ride?id=lyft&destination[latitude]=${lat}&destination[longitude]=${lng}`;
+  const canOpen = await Linking.canOpenURL(url);
+  if (canOpen) await Linking.openURL(url);
+};
+
+const openReservation = async (name: string) => {
+  const url = `https://www.opentable.com/s/?query=${encodeURIComponent(name)}`;
+  const canOpen = await Linking.canOpenURL(url);
+  if (canOpen) await Linking.openURL(url);
 };
 
 export function RestaurantDetailScreen() {
@@ -118,7 +138,7 @@ export function RestaurantDetailScreen() {
   if (isLoading) {
     return (
       <View style={[styles.screen, styles.centered]}>
-        <Ionicons name="restaurant-outline" size={40} color="#2c2c2e" />
+        <Ionicons name="restaurant-outline" size={40} color={theme.colors.mutedSoft} />
       </View>
     );
   }
@@ -126,7 +146,7 @@ export function RestaurantDetailScreen() {
   if (!restaurant) {
     return (
       <View style={[styles.screen, styles.centered]}>
-        <Ionicons name="cloud-offline-outline" size={40} color="#2c2c2e" />
+        <Ionicons name="cloud-offline-outline" size={40} color={theme.colors.mutedSoft} />
         <Text style={styles.errorText}>Couldn't load restaurant</Text>
         <Pressable onPress={fetchDetail} style={{ marginTop: 16 }}>
           <Text style={styles.retryText}>Try Again</Text>
@@ -157,7 +177,7 @@ export function RestaurantDetailScreen() {
           onPress={() => router.back()}
           accessibilityLabel="Back"
         >
-          <Ionicons name="chevron-back" size={24} color="#ffffff" />
+          <Ionicons name="chevron-back" size={24} color={theme.colors.ink} />
         </Pressable>
       </View>
 
@@ -173,7 +193,7 @@ export function RestaurantDetailScreen() {
         <View style={styles.ratingRow}>
           {ratingDisplay && (
             <>
-              <Ionicons name="star" size={14} color="#eab308" />
+              <Ionicons name="star" size={16} color="#eab308" />
               <Text style={styles.ratingText}>{ratingDisplay}</Text>
               <Text style={styles.reviewCount}>
                 {' '}({restaurant.review_count})
@@ -198,7 +218,7 @@ export function RestaurantDetailScreen() {
             }
             accessibilityLabel="Get directions"
           >
-            <Ionicons name="navigate" size={22} color="#f97316" />
+            <Ionicons name="navigate" size={22} color={theme.colors.primary} />
             <Text style={styles.actionBarLabel}>Directions</Text>
           </Pressable>
 
@@ -213,7 +233,7 @@ export function RestaurantDetailScreen() {
               }}
               accessibilityLabel="Call restaurant"
             >
-              <Ionicons name="call" size={22} color="#ababab" />
+              <Ionicons name="call" size={22} color={theme.colors.muted} />
               <Text style={styles.actionBarLabel}>Call</Text>
             </Pressable>
           )}
@@ -223,7 +243,7 @@ export function RestaurantDetailScreen() {
             onPress={handleShare}
             accessibilityLabel="Share restaurant"
           >
-            <Ionicons name="share-social-outline" size={22} color="#ababab" />
+            <Ionicons name="share-social-outline" size={22} color={theme.colors.muted} />
             <Text style={styles.actionBarLabel}>Share</Text>
           </Pressable>
 
@@ -235,10 +255,10 @@ export function RestaurantDetailScreen() {
             <Ionicons
               name={isSaved ? 'heart' : 'heart-outline'}
               size={22}
-              color={isSaved ? '#eab308' : '#ababab'}
+              color={isSaved ? theme.colors.primary : theme.colors.muted}
             />
             <Text style={styles.actionBarLabel}>
-              {isSaved ? 'Saved' : 'Add to Picks'}
+              {isSaved ? 'Saved' : 'Save'}
             </Text>
           </Pressable>
         </View>
@@ -246,8 +266,34 @@ export function RestaurantDetailScreen() {
         {/* Address */}
         <Text style={styles.sectionLabel}>ADDRESS</Text>
         <View style={styles.inlineRow}>
-          <Ionicons name="location-outline" size={16} color="#ababab" />
+          <Ionicons name="location-outline" size={16} color={theme.colors.muted} />
           <Text style={styles.body}> {restaurant.address}</Text>
+        </View>
+
+        {/* Actionability / Deep Links */}
+        <Text style={styles.sectionLabel}>BOOKING & RIDES</Text>
+        <View style={styles.deepLinkGrid}>
+          <Pressable 
+            style={styles.deepLinkButton}
+            onPress={() => openReservation(restaurant.name)}
+          >
+            <Ionicons name="calendar-outline" size={20} color={theme.colors.ink} />
+            <Text style={styles.deepLinkText}>Find Table</Text>
+          </Pressable>
+          <Pressable 
+            style={styles.deepLinkButton}
+            onPress={() => openUber(restaurant.location.lat, restaurant.location.lng, restaurant.name)}
+          >
+            <Ionicons name="car-sport-outline" size={20} color={theme.colors.ink} />
+            <Text style={styles.deepLinkText}>Uber</Text>
+          </Pressable>
+          <Pressable 
+            style={styles.deepLinkButton}
+            onPress={() => openLyft(restaurant.location.lat, restaurant.location.lng)}
+          >
+            <Ionicons name="car-outline" size={20} color={theme.colors.ink} />
+            <Text style={styles.deepLinkText}>Lyft</Text>
+          </Pressable>
         </View>
 
         {/* Opening hours */}
@@ -257,7 +303,7 @@ export function RestaurantDetailScreen() {
             <Text
               style={[
                 styles.body,
-                { color: isOpen ? '#22c55e' : '#ef4444', fontWeight: '700', marginBottom: 4 },
+                { color: isOpen ? '#22c55e' : theme.colors.error, fontWeight: '700', marginBottom: 4 },
               ]}
             >
               {isOpen ? 'Open now' : 'Closed'}
@@ -279,7 +325,7 @@ export default RestaurantDetailScreen;
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#0f0f0f',
+    backgroundColor: theme.colors.canvas,
   },
   centered: {
     alignItems: 'center',
@@ -288,16 +334,21 @@ const styles = StyleSheet.create({
   backButton: {
     position: 'absolute',
     left: 16,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(28,28,30,0.7)',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: theme.colors.surfaceStrong,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 3,
   },
   infoSheet: {
     flex: 1,
-    backgroundColor: '#1c1c1e',
+    backgroundColor: theme.colors.canvas,
   },
   infoContent: {
     paddingHorizontal: 16,
@@ -305,59 +356,53 @@ const styles = StyleSheet.create({
     paddingBottom: 48,
   },
   heading: {
-    color: '#ffffff',
-    fontSize: 22,
-    fontWeight: '700',
-    lineHeight: 22 * 1.2,
+    ...theme.typography.displayLg,
+    color: theme.colors.ink,
     marginBottom: 4,
   },
   ratingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 24,
     flexWrap: 'wrap',
     gap: 4,
   },
   ratingText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '400',
+    ...theme.typography.titleMd,
+    color: theme.colors.ink,
   },
   reviewCount: {
-    color: '#ababab',
-    fontSize: 13,
-    fontWeight: '400',
+    ...theme.typography.bodyMd,
+    color: theme.colors.muted,
   },
   ratingMeta: {
-    color: '#ababab',
-    fontSize: 16,
-    fontWeight: '400',
+    ...theme.typography.bodyMd,
+    color: theme.colors.muted,
   },
   actionBar: {
     flexDirection: 'row',
     gap: 8,
-    marginBottom: 24,
+    marginBottom: 32,
   },
   actionBarButton: {
     flex: 1,
-    height: 48,
-    backgroundColor: '#2c2c2e',
-    borderRadius: 8,
+    height: 56,
+    backgroundColor: theme.colors.surfaceSoft,
+    borderRadius: theme.rounded.md,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 4,
   },
   actionBarLabel: {
-    color: '#ababab',
-    fontSize: 13,
-    fontWeight: '700',
-    lineHeight: 13,
+    ...theme.typography.caption,
+    color: theme.colors.ink,
+    marginTop: 2,
   },
   sectionLabel: {
-    color: '#ababab',
-    fontSize: 13,
-    fontWeight: '700',
-    lineHeight: 13 * 1.2,
+    ...theme.typography.caption,
+    color: theme.colors.muted,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
     marginTop: 24,
     marginBottom: 8,
   },
@@ -367,18 +412,38 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   body: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '400',
-    lineHeight: 16 * 1.5,
+    ...theme.typography.bodyMd,
+    color: theme.colors.ink,
   },
   errorText: {
-    color: '#ababab',
+    ...theme.typography.bodyMd,
+    color: theme.colors.muted,
     marginTop: 16,
-    fontSize: 16,
   },
   retryText: {
-    color: '#f97316',
-    fontSize: 16,
+    ...theme.typography.buttonMd,
+    color: theme.colors.primary,
+  },
+  deepLinkGrid: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 8,
+  },
+  deepLinkButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 12,
+    backgroundColor: theme.colors.surfaceStrong,
+    borderRadius: theme.rounded.md,
+    borderWidth: 1,
+    borderColor: theme.colors.hairline,
+  },
+  deepLinkText: {
+    ...theme.typography.bodyMd,
+    color: theme.colors.ink,
+    fontWeight: '600',
   },
 });

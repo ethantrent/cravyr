@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import type { SavedRestaurant } from '@cravyr/shared';
 import { photoProxyUrl } from '../../lib/api';
+import { theme } from '../../lib/theme';
 
 interface RestaurantRowProps {
   pick: SavedRestaurant;
@@ -34,7 +35,7 @@ export function RestaurantRow({ pick }: RestaurantRowProps) {
             style={styles.superlikeBadge}
             accessibilityLabel="Superliked"
           >
-            <Ionicons name="star" size={13} color="#ffffff" />
+            <Ionicons name="star" size={13} color={theme.colors.onPrimary} />
           </View>
         )}
       </View>
@@ -50,7 +51,7 @@ export function RestaurantRow({ pick }: RestaurantRowProps) {
       </View>
 
       {/* Row chevron */}
-      <Ionicons name="chevron-forward" size={16} color="#636366" />
+      <Ionicons name="chevron-forward" size={16} color={theme.colors.mutedSoft} />
     </Pressable>
   );
 }
@@ -60,11 +61,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     height: 80,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: '#1c1c1e',
+    paddingHorizontal: theme.spacing.base,
+    paddingVertical: 12,
+    backgroundColor: theme.colors.canvas,
     borderBottomWidth: 1,
-    borderBottomColor: '#2c2c2e',
+    borderBottomColor: theme.colors.hairline,
   },
   thumbnailContainer: {
     position: 'relative',
@@ -73,33 +74,31 @@ const styles = StyleSheet.create({
   thumbnail: {
     width: 64,
     height: 64,
-    borderRadius: 8,
+    borderRadius: theme.rounded.xs,
   },
   superlikeBadge: {
     position: 'absolute',
-    bottom: 0,
-    right: 0,
+    bottom: -4,
+    right: -4,
     width: 20,
     height: 20,
-    borderRadius: 10,
-    backgroundColor: '#eab308',
+    borderRadius: theme.rounded.full,
+    backgroundColor: theme.colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: theme.colors.canvas,
   },
   info: {
     flex: 1,
     gap: 4,
   },
   name: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '700',
-    lineHeight: 16 * 1.3,
+    ...theme.typography.titleMd,
+    color: theme.colors.ink,
   },
   meta: {
-    color: '#ababab',
-    fontSize: 13,
-    fontWeight: '400',
-    lineHeight: 13 * 1.3,
+    ...theme.typography.bodySm,
+    color: theme.colors.muted,
   },
 });

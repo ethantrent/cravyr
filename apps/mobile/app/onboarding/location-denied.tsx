@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect } from 'react';
 import * as Location from 'expo-location';
+import { theme } from '../../lib/theme';
 
 export default function LocationDeniedScreen() {
   // Re-check permission when user returns from Settings
@@ -20,7 +21,7 @@ export default function LocationDeniedScreen() {
 
   return (
     <View style={styles.container}>
-      <Ionicons name="location-outline" size={64} color="#ababab" style={styles.icon} />
+      <Ionicons name="location-outline" size={64} color={theme.colors.muted} style={styles.icon} />
       <Text style={styles.heading}>Location access required</Text>
       <Text style={styles.body}>
         To find restaurants near you, allow location access in your device Settings.
@@ -43,7 +44,7 @@ export default function LocationDeniedScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f0f0f',
+    backgroundColor: theme.colors.canvas,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 32,
@@ -52,30 +53,25 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   heading: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#ffffff',
+    ...theme.typography.displayLg,
+    color: theme.colors.ink,
     textAlign: 'center',
     marginBottom: 16,
-    lineHeight: 22 * 1.2,
   },
   body: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: '#ababab',
+    ...theme.typography.bodyMd,
+    color: theme.colors.muted,
     textAlign: 'center',
-    lineHeight: 16 * 1.5,
     marginBottom: 8,
   },
   instruction: {
-    fontSize: 13,
-    fontWeight: '400',
-    color: '#ababab',
+    ...theme.typography.caption,
+    color: theme.colors.muted,
     textAlign: 'center',
   },
   button: {
-    backgroundColor: '#f97316',
-    borderRadius: 12,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.rounded.md,
     height: 56,
     width: '100%',
     marginTop: 32,
@@ -83,8 +79,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonLabel: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#ffffff',
+    ...theme.typography.buttonMd,
+    color: theme.colors.onPrimary,
   },
 });

@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import type { Restaurant } from '@cravyr/shared';
 import { useRouter } from 'expo-router';
 import { photoProxyUrl } from '../../lib/api';
+import { theme } from '../../lib/theme';
 
 interface SwipeCardProps {
   restaurant: Restaurant;
@@ -47,9 +48,9 @@ export function SwipeCard({ restaurant }: SwipeCardProps) {
 const styles = StyleSheet.create({
   card: {
     flex: 1,
-    borderRadius: 16,
+    borderRadius: theme.rounded.md,
     overflow: 'hidden',
-    backgroundColor: '#1c1c1e',
+    backgroundColor: theme.colors.canvas,
   },
   gradient: {
     position: 'absolute',
@@ -61,16 +62,12 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   name: {
-    color: '#ffffff',
-    fontSize: 22,
-    fontWeight: '700',
-    lineHeight: 22 * 1.2,
+    ...theme.typography.displayLg,
+    color: theme.colors.onDark,
     marginBottom: 4,
   },
   meta: {
+    ...theme.typography.bodyMd,
     color: 'rgba(255,255,255,0.85)',
-    fontSize: 16,
-    fontWeight: '400',
-    lineHeight: 16 * 1.3,
   },
 });

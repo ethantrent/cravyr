@@ -109,6 +109,10 @@ export function SettingsScreen() {
       {/* Session */}
       <View style={styles.sectionGroup}>
         <SettingsRow
+          label="My Connections"
+          onPress={() => router.push('/connections')}
+        />
+        <SettingsRow
           label="Sign Out"
           onPress={handleSignOut}
           showChevron={false}
@@ -130,10 +134,12 @@ export function SettingsScreen() {
 
 export default SettingsScreen;
 
+import { theme } from '../lib/theme';
+
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#0f0f0f',
+    backgroundColor: theme.colors.surfaceStrong,
     paddingTop: 24,
   },
   sectionGroup: {
@@ -145,17 +151,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     height: 48,
     paddingHorizontal: 16,
-    backgroundColor: '#1c1c1e',
+    backgroundColor: theme.colors.canvas,
     borderBottomWidth: 1,
-    borderBottomColor: '#2c2c2e',
+    borderBottomColor: theme.colors.hairline,
   },
   rowLabel: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '400',
-    lineHeight: 16 * 1.5,
+    ...theme.typography.bodyMd,
+    color: theme.colors.ink,
   },
   destructiveLabel: {
-    color: '#ef4444',
+    color: theme.colors.error,
   },
 });

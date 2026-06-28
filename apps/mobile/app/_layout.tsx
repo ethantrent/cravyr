@@ -8,6 +8,14 @@ import { API_URL } from '../lib/api';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Notifications from 'expo-notifications';
 import { ErrorBoundary } from '../components/ErrorBoundary';
+import {
+  useFonts,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+} from '@expo-google-fonts/inter';
+import { theme } from '../lib/theme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -61,6 +69,12 @@ async function registerPushToken(session: Session) {
 export default function RootLayout() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
   const appState = useRef(AppState.currentState);
   const router = useRouter();
 
@@ -96,19 +110,17 @@ export default function RootLayout() {
   const segments = useSegments();
 
   useEffect(() => {
-    if (loading) return;
+    if (loading || !fontsLoaded) return;
     const root = segments[0] as string | undefined;
     const inOnboarding = root === 'onboarding';
     const inAuthCallback = root === 'auth-callback';
 
     if (!session && !inOnboarding && !inAuthCallback) {
       router.replace('/onboarding');
-    } else if (session && inOnboarding) {
-      router.replace('/(tabs)/discover');
     }
   }, [session, loading, segments]);
 
-  if (loading) return null;
+  if (loading || !fontsLoaded) return null;
 
   return (
     <ErrorBoundary>
@@ -131,16 +143,18 @@ export default function RootLayout() {
         name="preferences"
         options={{
           title: 'Preferences',
-          headerTintColor: '#ffffff',
-          headerStyle: { backgroundColor: '#0f0f0f' },
+          headerTintColor: theme.colors.ink,
+          headerStyle: { backgroundColor: theme.colors.canvas },
+          headerTitleStyle: theme.typography.titleSm,
         }}
       />
       <Stack.Screen
         name="settings"
         options={{
           title: 'Settings',
-          headerTintColor: '#ffffff',
-          headerStyle: { backgroundColor: '#0f0f0f' },
+          headerTintColor: theme.colors.ink,
+          headerStyle: { backgroundColor: theme.colors.canvas },
+          headerTitleStyle: theme.typography.titleSm,
         }}
       />
     </Stack>
