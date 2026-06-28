@@ -1,6 +1,7 @@
 {
   "name": "cravyr",
   "private": true,
+  "packageManager": "pnpm@9.15.9",
   "scripts": {
     "postinstall": "node scripts/patch-rn-gradle.js",
     "build": "turbo run build",
