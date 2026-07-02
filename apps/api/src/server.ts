@@ -89,6 +89,12 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Deployed commit — polled by the deploy-verify GitHub Action after each push
+// so a failed Render build can't go unnoticed (RENDER_GIT_COMMIT is injected by Render)
+app.get('/version', (_req, res) => {
+  res.json({ commit: process.env.RENDER_GIT_COMMIT ?? 'unknown' });
+});
+
 // Privacy policy — App Store requires a hosted URL
 app.get('/privacy', (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'privacy.html'));

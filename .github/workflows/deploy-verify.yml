@@ -1,0 +1,35 @@
+# Verifies that Render actually deployed the pushed commit. Render auto-deploys
+# on push to main but failures are silent from the repo's perspective — a broken
+# build once left production on a stale binary for 4 days (see 652b7ff). This
+# workflow polls /version (which reports RENDER_GIT_COMMIT) until it matches the
+# pushed SHA, and fails the run — triggering GitHub's failure notification — if
+# the deploy hasn't landed within the timeout.
+name: Verify Render Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  verify-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Poll /version until it reports the pushed commit
+        run: |
+          URL="https://cravyr-api.onrender.com/version"
+          EXPECTED="${GITHUB_SHA}"
+          echo "Expecting commit: $EXPECTED"
+          # 40 attempts x 30s = 20 minutes (free-tier builds + cold starts are slow)
+          for i in $(seq 1 40); do
+            DEPLOYED=$(curl -sS --max-time 90 "$URL" | jq -r '.commit' 2>/dev/null || echo "unreachable")
+            echo "Attempt $i/40: deployed=$DEPLOYED"
+            if [ "$DEPLOYED" = "$EXPECTED" ]; then
+              echo "Deploy verified: $DEPLOYED"
+              exit 0
+            fi
+            sleep 30
+          done
+          echo "::error::Render never served commit $EXPECTED (last seen: $DEPLOYED)."
+          echo "::error::Check the Render dashboard build logs — the deploy likely failed."
+          exit 1
