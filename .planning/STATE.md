@@ -44,7 +44,7 @@ Plan: 1 of 4
 - upsert_restaurant RPC requires SET search_path TO 'public', 'extensions' for ST_MakePoint to resolve
 - New Architecture enabled for react-native-worklets compatibility
 - Apple Sign-In fully wired (onboarding/index.tsx: signInWithIdToken + first-sign-in fullName capture) — Apple Developer entitlement (capability on the App ID) still required before it works on device
-- Social features (friends/connections, group matches, travel mode) shipped 2026-06-28 in fd2a683/de2eca5 — outside the original MVP roadmap; privacy policy updated 2026-07-02 (quick 260702-pv1); migrations 20260710/20260720 still need `supabase db push` to production
+- Social features (friends/connections, group matches, travel mode) shipped 2026-06-28 in fd2a683/de2eca5 — outside the original MVP roadmap; privacy policy updated 2026-07-02 (quick 260702-pv1); migrations 20260710/20260720 confirmed applied to remote (verified via `supabase migration list` 2026-07-02)
 
 ### Open Research Gaps
 
@@ -67,7 +67,7 @@ None
 ## Session Continuity
 
 Last updated: 2026-07-02 — Completed quick task 260702-pv1: privacy policy + App Privacy declarations updated for the June social features (friends/connections/group matches). GSD tooling migrated to @opengsd/gsd-core 1.6.1 (project-local install).
-Next action: apply social-feature migrations (20260710, 20260720) to production Supabase, then human-only steps in SUBMISSION-RUNBOOK.md §1 (Apple Developer), §5 (portal), §6 (App Store Connect — unlocks ascAppId), §7-13
+Next action: human-only steps in SUBMISSION-RUNBOOK.md §1 (Apple Developer enrollment — 24-48h bottleneck, start first), §5 (portal), §6 (App Store Connect — unlocks ascAppId), §7-13. All migrations applied; privacy policy deployed to Render 2026-07-02.
 
 ## Human Actions Required
 
