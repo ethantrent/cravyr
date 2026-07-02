@@ -88,5 +88,5 @@ Next action: human-only steps in SUBMISSION-RUNBOOK.md §1 (Apple Developer enro
 7. Run `eas build --platform all --profile production` to verify builds
 8. Run `eas submit --platform ios` for TestFlight
 9. Capture App Store screenshots
-10. Set up a Google Cloud billing alert ($50/day) on the Places API project (Cloud Console → Billing → Budgets & alerts) — guards against Pitfall 2 field-mask cost blowout.
+10. ✅ Google Cloud cost guards set up 2026-07-02 via gcloud CLI (project eminent-bond-467116-h6): (a) $100/month budget "Cravyr Places API cost guard" with 25/50/90/100% email alerts (budget 41ebdfc6-a246-442f-83b6-b42fdbeccac3); (b) hard daily quota caps on Places API (New) — SearchNearby/GetPlace/Autocomplete 1,000/day, GetPhotoMedia 2,000/day, unused endpoints 100/day; (c) API key restricted from the 33-service Maps Platform bundle down to places.googleapis.com only.
 11. ✅ Apply migration 20260702000000_database_size_rpc.sql (`pnpm exec supabase db push --yes --include-all`, 2026-07-02) — DB-size guard verified live in CI: run 28615606565 reported ~19 MB, passed.
