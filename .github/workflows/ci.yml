@@ -16,9 +16,9 @@ jobs:
         with:
           node-version: 20
 
+      # pnpm version comes from the packageManager field in package.json —
+      # setting `version:` here too makes action-setup@v4 error out
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
