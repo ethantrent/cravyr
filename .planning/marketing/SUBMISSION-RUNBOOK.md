@@ -224,11 +224,13 @@ Steps (https://appstoreconnect.apple.com -> My Apps -> +):
    - **What's New (v1.0 release notes)** — from `## iOS App Store -> What's New`
    - **Privacy Policy URL**: `https://cravyr-api.onrender.com/privacy`
    - **Support URL**: same or a dedicated page
-5. **App Privacy** section — declare data collected (matches `apps/api/src/public/privacy.html`):
+5. **App Privacy** section — declare data collected (matches `apps/api/src/public/privacy.html`, updated 2026-07-02 for social features):
    - Contact Info (email) — linked to identity
+   - Contact Info (name / display name) — linked to identity, used for app functionality (shown to connected friends in the friends list)
    - Location (coarse) — not linked, used for app functionality
    - Identifiers (device push token) — not linked, used for app functionality
-   - Usage Data (swipes, saves) — linked, used for app functionality
+   - Identifiers (User ID) — linked, used for app functionality (friend connections store links between user accounts)
+   - Usage Data (swipes, saves) — linked, used for app functionality (mutually saved restaurants are visible to connected friends as "matches")
 
 Acceptance:
 - App record visible in App Store Connect
