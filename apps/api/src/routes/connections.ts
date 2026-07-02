@@ -19,8 +19,12 @@ connectionsRouter.use(requireAuth);
  * GET /api/v1/connections
  * Fetch all connections for the current user, joined with auth.users for names.
  */
-connectionsRouter.get('/', async (req: Request, res: Response) => {
-  const userId = res.locals.user.id;
+connectionsRouter.get('/', async (req: Request & { user?: { id: string } }, res: Response) => {
+  const userId = req.user?.id;
+  if (!userId) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
   try {
     // We need to query connections where user1_id = userId OR user2_id = userId.
     const { data: connections, error } = await supabaseAdmin
@@ -68,9 +72,13 @@ connectionsRouter.get('/', async (req: Request, res: Response) => {
  * POST /api/v1/connections/code
  * Generate a 6-digit connection code
  */
-connectionsRouter.post('/code', async (req: Request, res: Response) => {
-  const userId = res.locals.user.id;
-  const code = Array.from(randomBytes(3))
+connectionsRouter.post('/code', async (req: Request & { user?: { id: string } }, res: Response) => {
+  const userId = req.user?.id;
+  if (!userId) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+  const code = Array.from(randomBytes(6))
     .map((b) => (b % 10).toString())
     .join('');
 
@@ -98,8 +106,12 @@ const LinkBodySchema = z.object({
  * POST /api/v1/connections/link
  * Use a 6-digit code to create a connection
  */
-connectionsRouter.post('/link', validate(LinkBodySchema, 'body'), async (req: Request, res: Response) => {
-  const userId = res.locals.user.id;
+connectionsRouter.post('/link', validate(LinkBodySchema, 'body'), async (req: Request & { user?: { id: string } }, res: Response) => {
+  const userId = req.user?.id;
+  if (!userId) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
   const { code } = res.locals.validated as { code: string };
 
   try {
@@ -150,8 +162,12 @@ connectionsRouter.post('/link', validate(LinkBodySchema, 'body'), async (req: Re
 /**
  * DELETE /api/v1/connections/:friendId
  */
-connectionsRouter.delete('/:friendId', async (req: Request, res: Response) => {
-  const userId = res.locals.user.id;
+connectionsRouter.delete('/:friendId', async (req: Request & { user?: { id: string } }, res: Response) => {
+  const userId = req.user?.id;
+  if (!userId) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
   const friendId = req.params.friendId;
 
   const user1_id = userId < friendId ? userId : friendId;

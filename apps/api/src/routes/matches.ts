@@ -16,8 +16,12 @@ matchesRouter.use(requireAuth);
  * GET /api/v1/matches?friendIds=uuid1,uuid2
  * Returns restaurants that the current user AND all specified friendIds have saved.
  */
-matchesRouter.get('/', async (req: Request, res: Response) => {
-  const userId = res.locals.user.id;
+matchesRouter.get('/', async (req: Request & { user?: { id: string } }, res: Response) => {
+  const userId = req.user?.id;
+  if (!userId) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
   const friendIdsParam = req.query.friendIds as string;
 
   if (!friendIdsParam) {
