@@ -23,3 +23,37 @@ jobs:
             exit 1
           fi
           echo "Supabase keep-alive ping successful"
+
+      - name: Check database size
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          # Guards against Pitfall 8: the free-tier 500MB cap silently flips the DB to
+          # read-only mode. Fail loudly (GitHub failure email) as usage approaches it.
+          # Threshold: 400 MiB = 419430400 bytes (~80% of the 500MB limit).
+          THRESHOLD=419430400
+          SIZE=$(curl -s -X POST \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            "${SUPABASE_URL}/rest/v1/rpc/database_size_bytes")
+          # The RPC returns a bare integer. If it is not numeric, the migration
+          # (20260702000000_database_size_rpc.sql) has not been applied to remote yet
+          # (human action via `supabase db push`). Warn but do not fail the keep-alive.
+          case "${SIZE}" in
+            ''|*[!0-9]*)
+              echo "WARNING: database_size_bytes RPC returned non-numeric value: '${SIZE}'"
+              echo "The RPC migration may not be applied to remote yet (supabase db push). Skipping size check."
+              exit 0
+              ;;
+          esac
+          SIZE_MB=$((SIZE / 1048576))
+          echo "Database size: ${SIZE} bytes (~${SIZE_MB} MB)"
+          if [ "${SIZE}" -gt "${THRESHOLD}" ]; then
+            echo "ERROR: Database size ~${SIZE_MB} MB is approaching the 500MB free-tier limit."
+            echo "At 500MB Supabase silently switches to read-only mode (Pitfall 8). Archive old data or upgrade to Pro."
+            exit 1
+          fi
+          echo "Database size check passed (under 400MiB threshold)."
