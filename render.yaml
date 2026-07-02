@@ -10,7 +10,9 @@ services:
     plan: free
     region: oregon
     numInstances: 1
-    buildCommand: pnpm install --frozen-lockfile && pnpm --filter @cravyr/shared build && pnpm --filter cravyr-api build
+    # --prod=false: NODE_ENV=production (below) applies at build time too, making pnpm skip
+    # devDependencies — without it tsc/@types are missing and every build fails (exit 2).
+    buildCommand: pnpm install --frozen-lockfile --prod=false && pnpm --filter @cravyr/shared build && pnpm --filter cravyr-api build
     startCommand: node apps/api/dist/server.js
     healthCheckPath: /health
     envVars:
