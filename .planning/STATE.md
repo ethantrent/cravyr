@@ -74,7 +74,8 @@ None
 
 Last activity: 2026-07-02 — Completed quick task 260702-dpv: PITFALLS.md open items (DB-size CI guard, billing-alert human action, cold-start accepted risk).
 Last updated: 2026-07-02 — Quick tasks pv1 (privacy), st1 (social auth bug + tests), da1 (deploy alarm) complete. Found+fixed: Render deploys silently failing since 2026-06-28 (stale lockfile, 652b7ff), CI silently failing since 8e38d19 (pnpm action-setup conflict, 3bf503a), social routes 500ing on every authed call (res.locals.user, 66b7326), unredeemable 3-digit invite codes (66b7326). PROJECT.md requirements marked implemented; SOCIAL-01/02 + TRAVEL-01 registered. GSD tooling migrated to @opengsd/gsd-core 1.6.1.
-Next action: human-only steps in SUBMISSION-RUNBOOK.md §1 (Apple Developer enrollment — 24-48h bottleneck, start first), §5 (portal), §6 (App Store Connect — unlocks ascAppId), §7-13. All migrations applied; privacy policy deployed to Render 2026-07-02.
+Next action: human-only steps in SUBMISSION-RUNBOOK.md §1 (Apple Developer enrollment — 24-48h bottleneck, start first), §5 (portal), §6 (App Store Connect — unlocks ascAppId), §7-13. All migrations applied.
+⚠ RENDER DEPLOYS BROKEN SINCE ~APRIL 24 (found 2026-07-02 via deploy-verify alarm): live /privacy still says "Last updated: April 24, 2026" and /version 404s — no push since then has landed. The stale-lockfile fix (652b7ff) did NOT unblock it; the full render.yaml buildCommand passes locally, so the failure is Render-side (check dashboard → cravyr-api → Events/build logs; verify auto-deploy is on and the service settings match render.yaml — if the service was created manually rather than via Blueprint, dashboard build settings may be stale). Every deploy-verify run today failed with "Render never served commit".
 
 ## Human Actions Required
 
@@ -82,7 +83,7 @@ Next action: human-only steps in SUBMISSION-RUNBOOK.md §1 (Apple Developer enro
 2. Configure Apple Developer account and enable "Sign in with Apple" capability
 3. Set `ascAppId` in `apps/mobile/eas.json` to real App Store Connect app ID
 4. Set `EXPO_TOKEN` secret in GitHub repo for CI builds
-5. Privacy policy page ✅ written (apps/api/src/public/privacy.html, updated 2026-07-02 for social features) — still needs a Render deploy (`git push origin main`) so https://cravyr-api.onrender.com/privacy serves the new copy
+5. Privacy policy page ✅ written (apps/api/src/public/privacy.html, updated 2026-07-02 for social features) — pushed to GitHub 2026-07-02 but NOT live: Render deploys have failed since ~April 24 (see ⚠ above). Fix Render deploys first; then confirm https://cravyr-api.onrender.com/privacy shows the July copy
 6. ✅ App icon sized to 1024×1024 (quick 260424-jw8 — center crop of existing landscape; a designer-supplied high-res source is still recommended before final submission, regenerate via `node apps/mobile/scripts/generate-app-icons.mjs --source <new-source> --mode fit --out-dir apps/mobile/assets --confirm-overwrite`)
 7. Run `eas build --platform all --profile production` to verify builds
 8. Run `eas submit --platform ios` for TestFlight
