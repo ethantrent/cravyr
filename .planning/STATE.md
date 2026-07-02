@@ -45,6 +45,8 @@ Plan: 1 of 4
 - New Architecture enabled for react-native-worklets compatibility
 - Apple Sign-In fully wired (onboarding/index.tsx: signInWithIdToken + first-sign-in fullName capture) — Apple Developer entitlement (capability on the App ID) still required before it works on device
 - Social features (friends/connections, group matches, travel mode) shipped 2026-06-28 in fd2a683/de2eca5 — outside the original MVP roadmap; privacy policy updated 2026-07-02 (quick 260702-pv1); migrations 20260710/20260720 confirmed applied to remote (verified via `supabase migration list` 2026-07-02)
+- Render free-tier cold-start (25–60s on the first request after 15 min idle) is an ACCEPTED known limitation — the user deliberately keeps render.yaml `plan: free` and 800px photo widths (maxWidthPx) as-is; UptimeRobot / paid Render Starter upgrade explicitly deferred (quick 260702-dpv)
+- DB-size CI guard (quick 260702-dpv): the supabase-keepalive workflow now fails above ~400MB (419430400 bytes) so GitHub emails on approach to the 500MB free-tier read-only cap (Pitfall 8); migration 20260702000000_database_size_rpc.sql requires `supabase db push` before the check goes active
 
 ### Open Research Gaps
 
@@ -65,9 +67,11 @@ None
 | 260702-pv1 | Update privacy policy + App Privacy declarations for social features (friends/connections/matches) | 2026-07-02 | d40ee42 | [260702-pv1-update-privacy-policy-social-features](./quick/260702-pv1-update-privacy-policy-social-features/) |
 | 260702-st1 | Fix social-route auth bug (res.locals.user 500s) + 3-digit invite codes; 14 authenticated integration tests | 2026-07-02 | 66b7326 | [260702-st1-fix-social-auth-bug-add-endpoint-tests](./quick/260702-st1-fix-social-auth-bug-add-endpoint-tests/) |
 | 260702-da1 | Deploy-failure alarm: GET /version + deploy-verify workflow; also fixed CI pnpm setup broken since 8e38d19 | 2026-07-02 | c239994 | [260702-da1-deploy-verification-alarm](./quick/260702-da1-deploy-verification-alarm/) |
+| 260702-dpv | PITFALLS.md open items: DB-size CI guard (RPC + keepalive workflow), billing-alert human action, cold-start accepted-risk decision | 2026-07-02 | 59523e9 | [260702-dpv-address-pitfalls-md-open-items-db-size-c](./quick/260702-dpv-address-pitfalls-md-open-items-db-size-c/) |
 
 ## Session Continuity
 
+Last activity: 2026-07-02 — Completed quick task 260702-dpv: PITFALLS.md open items (DB-size CI guard, billing-alert human action, cold-start accepted risk).
 Last updated: 2026-07-02 — Quick tasks pv1 (privacy), st1 (social auth bug + tests), da1 (deploy alarm) complete. Found+fixed: Render deploys silently failing since 2026-06-28 (stale lockfile, 652b7ff), CI silently failing since 8e38d19 (pnpm action-setup conflict, 3bf503a), social routes 500ing on every authed call (res.locals.user, 66b7326), unredeemable 3-digit invite codes (66b7326). PROJECT.md requirements marked implemented; SOCIAL-01/02 + TRAVEL-01 registered. GSD tooling migrated to @opengsd/gsd-core 1.6.1.
 Next action: human-only steps in SUBMISSION-RUNBOOK.md §1 (Apple Developer enrollment — 24-48h bottleneck, start first), §5 (portal), §6 (App Store Connect — unlocks ascAppId), §7-13. All migrations applied; privacy policy deployed to Render 2026-07-02.
 
@@ -82,3 +86,5 @@ Next action: human-only steps in SUBMISSION-RUNBOOK.md §1 (Apple Developer enro
 7. Run `eas build --platform all --profile production` to verify builds
 8. Run `eas submit --platform ios` for TestFlight
 9. Capture App Store screenshots
+10. Set up a Google Cloud billing alert ($50/day) on the Places API project (Cloud Console → Billing → Budgets & alerts) — guards against Pitfall 2 field-mask cost blowout.
+11. Run `supabase db push` to apply migration 20260702000000_database_size_rpc.sql — until applied, the keepalive DB-size guard warns-and-passes instead of measuring real size.
