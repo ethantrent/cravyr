@@ -15,8 +15,13 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
+          # Query a real table so the request counts as database activity for the
+          # free-tier auto-pause policy. The /rest/v1/ root (OpenAPI introspection)
+          # now returns 401 regardless of auth and never touched the DB anyway.
           HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            "${SUPABASE_URL}/rest/v1/?apikey=${SUPABASE_ANON_KEY}&limit=0")
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
+            "${SUPABASE_URL}/rest/v1/restaurants?select=id&limit=1")
           echo "Supabase responded with HTTP ${HTTP_STATUS}"
           if [ "${HTTP_STATUS}" -ne 200 ]; then
             echo "ERROR: Supabase ping failed with status ${HTTP_STATUS}"
