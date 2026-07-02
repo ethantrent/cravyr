@@ -16,21 +16,27 @@ The swipe feels right — 60fps, responsive, and frictionless — because a jank
 
 ### Active
 
-- [ ] **CORE-01**: Swipe card deck with 60fps animation (right = save, left = skip, up = superlike, undo)
-- [ ] **API-01**: Location-based restaurant feed via Google Places API (New) with field masks + geographic batching
-- [ ] **API-02**: Supabase backend with PostGIS spatial index and recommendation SQL function
-- [ ] **AUTH-01**: Authentication: email/password + Google + Apple Sign-In
-- [ ] **CORE-02**: "Tonight's Picks" saved list (auto-populated on right-swipe via DB trigger)
-- [ ] **CORE-03**: Restaurant detail view (photos, hours, directions, rating, price level)
-- [ ] **CORE-04**: User preferences (cuisines, price range, max distance)
-- [ ] **UX-01**: Onboarding flow (complete enough to pass App Store review)
-- [ ] **NOTIF-01**: Push notifications (daily 6PM reminder only — closing-soon deferred to v1.1)
-- [ ] **UX-02**: Settings screen (with account deletion — required for App Store)
-- [ ] **INFRA-01**: Monorepo scaffold (Turborepo + pnpm, apps/mobile + apps/api + packages/shared)
+All Phase 1–5 requirements are implemented (roadmap complete 2026-04-15); they move to
+Validated once real users exercise them post-launch.
+
+- [x] **CORE-01**: Swipe card deck with 60fps animation (right = save, left = skip, up = superlike, undo) — implemented Phase 4; 60fps on low-end Android still needs on-device confirmation
+- [x] **API-01**: Location-based restaurant feed via Google Places API (New) with field masks + geographic batching — implemented Phase 2
+- [x] **API-02**: Supabase backend with PostGIS spatial index and recommendation SQL function — implemented Phases 1–2
+- [x] **AUTH-01**: Authentication: email/password + Google + Apple Sign-In — implemented Phase 3 (Apple needs Developer-portal capability before it works on device)
+- [x] **CORE-02**: "Tonight's Picks" saved list (auto-populated on right-swipe via DB trigger) — implemented Phase 4
+- [x] **CORE-03**: Restaurant detail view (photos, hours, directions, rating, price level) — implemented Phase 4
+- [x] **CORE-04**: User preferences (cuisines, price range, max distance) — implemented Phase 4
+- [x] **UX-01**: Onboarding flow (complete enough to pass App Store review) — implemented Phase 3
+- [x] **NOTIF-01**: Push notifications (daily 6PM reminder, per-user timezone since 3a6a17e) — implemented Phase 5
+- [x] **UX-02**: Settings screen (with account deletion — required for App Store) — implemented Phase 4
+- [x] **INFRA-01**: Monorepo scaffold (Turborepo + pnpm, apps/mobile + apps/api + packages/shared) — implemented Phase 1
+- [x] **SOCIAL-01**: Friend connections via 6-digit invite codes (15-min expiry), N-to-N model — shipped 2026-06-28 (de2eca5/fd2a683) outside the roadmap; auth + code-length bugs fixed 2026-07-02 (quick 260702-st1)
+- [x] **SOCIAL-02**: Group matches — restaurants all selected friends have saved (get_group_matches RPC, match modal) — shipped 2026-06-28
+- [x] **TRAVEL-01**: Travel mode — browse restaurants at a searched destination instead of current location (geocoding via location-search) — shipped 2026-06-28
 
 ### Out of Scope
 
-- Real-time/multiplayer features — MVP is single-player; Supabase subscriptions unnecessary
+- ~~Real-time/multiplayer features~~ — superseded 2026-06-28: async social (SOCIAL-01/02) shipped; still no real-time subscriptions — matches are computed on read, so Supabase realtime remains unnecessary
 - ML-based collaborative filtering — SQL scoring function sufficient through 50K users
 - Yelp API integration — 24hr cache limit and ToS restrictions make it hostile for swipe apps
 - Redis caching — in-memory node-cache appropriate for Render free/starter tier
@@ -43,6 +49,7 @@ The swipe feels right — 60fps, responsive, and frictionless — because a jank
 - App Store requires a complete app (onboarding, detail view, preferences, settings) — ~40% first-submission rejection rate for skeleton MVPs
 - Apple Sign-In is mandatory when any social login is offered; full name must be captured on first login only
 - Supabase free tier auto-pauses after 7 days of no DB activity — requires a keep-alive cron job
+- Render deploys and CI both failed silently 2026-06-28 → 2026-07-02 (stale lockfile + pnpm action-setup version conflict); fixed, and every push to main is now verified end-to-end by the deploy-verify workflow polling GET /version
 
 ## Constraints
 
@@ -83,4 +90,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-06 after initialization*
+*Last updated: 2026-07-02 — requirements marked implemented, social scope (SOCIAL-01/02, TRAVEL-01) registered, out-of-scope multiplayer superseded*

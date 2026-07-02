@@ -63,10 +63,12 @@ None
 | 260424-km4 | production submission runbook + app config validation | 2026-04-24 | 9e2089e | [260424-km4-generate-production-submission-runbook-a](./quick/260424-km4-generate-production-submission-runbook-a/) |
 | 260424-kxi | Execute automatable submission runbook steps: Supabase migrations, Render verify, app.config.ts + eas.json fixes | 2026-04-24 | d875507 | [260424-kxi-execute-automatable-submission-runbook-s](./quick/260424-kxi-execute-automatable-submission-runbook-s/) |
 | 260702-pv1 | Update privacy policy + App Privacy declarations for social features (friends/connections/matches) | 2026-07-02 | d40ee42 | [260702-pv1-update-privacy-policy-social-features](./quick/260702-pv1-update-privacy-policy-social-features/) |
+| 260702-st1 | Fix social-route auth bug (res.locals.user 500s) + 3-digit invite codes; 14 authenticated integration tests | 2026-07-02 | 66b7326 | [260702-st1-fix-social-auth-bug-add-endpoint-tests](./quick/260702-st1-fix-social-auth-bug-add-endpoint-tests/) |
+| 260702-da1 | Deploy-failure alarm: GET /version + deploy-verify workflow; also fixed CI pnpm setup broken since 8e38d19 | 2026-07-02 | c239994 | [260702-da1-deploy-verification-alarm](./quick/260702-da1-deploy-verification-alarm/) |
 
 ## Session Continuity
 
-Last updated: 2026-07-02 — Completed quick task 260702-pv1: privacy policy + App Privacy declarations updated for the June social features (friends/connections/group matches). GSD tooling migrated to @opengsd/gsd-core 1.6.1 (project-local install).
+Last updated: 2026-07-02 — Quick tasks pv1 (privacy), st1 (social auth bug + tests), da1 (deploy alarm) complete. Found+fixed: Render deploys silently failing since 2026-06-28 (stale lockfile, 652b7ff), CI silently failing since 8e38d19 (pnpm action-setup conflict, 3bf503a), social routes 500ing on every authed call (res.locals.user, 66b7326), unredeemable 3-digit invite codes (66b7326). PROJECT.md requirements marked implemented; SOCIAL-01/02 + TRAVEL-01 registered. GSD tooling migrated to @opengsd/gsd-core 1.6.1.
 Next action: human-only steps in SUBMISSION-RUNBOOK.md §1 (Apple Developer enrollment — 24-48h bottleneck, start first), §5 (portal), §6 (App Store Connect — unlocks ascAppId), §7-13. All migrations applied; privacy policy deployed to Render 2026-07-02.
 
 ## Human Actions Required
