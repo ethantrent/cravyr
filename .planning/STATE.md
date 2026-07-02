@@ -46,7 +46,8 @@ Plan: 1 of 4
 - Apple Sign-In fully wired (onboarding/index.tsx: signInWithIdToken + first-sign-in fullName capture) — Apple Developer entitlement (capability on the App ID) still required before it works on device
 - Social features (friends/connections, group matches, travel mode) shipped 2026-06-28 in fd2a683/de2eca5 — outside the original MVP roadmap; privacy policy updated 2026-07-02 (quick 260702-pv1); migrations 20260710/20260720 confirmed applied to remote (verified via `supabase migration list` 2026-07-02)
 - Render free-tier cold-start (25–60s on the first request after 15 min idle) is an ACCEPTED known limitation — the user deliberately keeps render.yaml `plan: free` and 800px photo widths (maxWidthPx) as-is; UptimeRobot / paid Render Starter upgrade explicitly deferred (quick 260702-dpv)
-- DB-size CI guard (quick 260702-dpv): the supabase-keepalive workflow now fails above ~400MB (419430400 bytes) so GitHub emails on approach to the 500MB free-tier read-only cap (Pitfall 8); migration 20260702000000_database_size_rpc.sql requires `supabase db push` before the check goes active
+- DB-size CI guard (quick 260702-dpv): the supabase-keepalive workflow now fails above ~400MB (419430400 bytes) so GitHub emails on approach to the 500MB free-tier read-only cap (Pitfall 8); migration 20260702000000_database_size_rpc.sql applied to remote 2026-07-02, guard verified green in CI
+- Supabase keepalive had silently failed every scheduled run since 2026-06-07: (a) Supabase stopped serving the /rest/v1/ OpenAPI root with query-param auth (fixed 87d3ece — ping now header-auths a real `restaurants?select=id&limit=1` query, which is what the auto-pause policy actually counts), and (b) the SUPABASE_URL/SUPABASE_ANON_KEY GitHub secrets set 2026-04-12 were stale — reset 2026-07-02 to current project values
 
 ### Open Research Gaps
 
@@ -87,4 +88,4 @@ Next action: human-only steps in SUBMISSION-RUNBOOK.md §1 (Apple Developer enro
 8. Run `eas submit --platform ios` for TestFlight
 9. Capture App Store screenshots
 10. Set up a Google Cloud billing alert ($50/day) on the Places API project (Cloud Console → Billing → Budgets & alerts) — guards against Pitfall 2 field-mask cost blowout.
-11. Run `supabase db push` to apply migration 20260702000000_database_size_rpc.sql — until applied, the keepalive DB-size guard warns-and-passes instead of measuring real size.
+11. ✅ Apply migration 20260702000000_database_size_rpc.sql (`pnpm exec supabase db push --yes --include-all`, 2026-07-02) — DB-size guard verified live in CI: run 28615606565 reported ~19 MB, passed.
