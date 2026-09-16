@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-07-02T00:00:00.000Z"
+last_updated: "2026-09-16T00:09:55.164Z"
 progress:
   total_phases: 5
   completed_phases: 4
@@ -69,8 +69,11 @@ None
 | 260702-st1 | Fix social-route auth bug (res.locals.user 500s) + 3-digit invite codes; 14 authenticated integration tests | 2026-07-02 | 66b7326 | [260702-st1-fix-social-auth-bug-add-endpoint-tests](./quick/260702-st1-fix-social-auth-bug-add-endpoint-tests/) |
 | 260702-da1 | Deploy-failure alarm: GET /version + deploy-verify workflow; also fixed CI pnpm setup broken since 8e38d19 | 2026-07-02 | c239994 | [260702-da1-deploy-verification-alarm](./quick/260702-da1-deploy-verification-alarm/) |
 | 260702-dpv | PITFALLS.md open items: DB-size CI guard (RPC + keepalive workflow), billing-alert human action, cold-start accepted-risk decision | 2026-07-02 | 59523e9 | [260702-dpv-address-pitfalls-md-open-items-db-size-c](./quick/260702-dpv-address-pitfalls-md-open-items-db-size-c/) |
+| 260915-qm9 | Add repository walkthrough and local setup documentation; no release claims or application changes | 2026-09-15 | See git history | [Quick-task record](./quick/260915-qm9-document-cravyr-code-walkthrough-and-loc/SUMMARY.md) |
 
 ## Session Continuity
+
+Documentation follow-up, 2026-09-15: completed 260915-qm9. Source-link and command checks passed; runtime/device validation remains separate. Earlier release-session notes below are retained.
 
 Last activity: 2026-07-02 — Completed quick task 260702-dpv: PITFALLS.md open items (DB-size CI guard, billing-alert human action, cold-start accepted risk).
 Last updated: 2026-07-02 — Quick tasks pv1 (privacy), st1 (social auth bug + tests), da1 (deploy alarm) complete. Found+fixed: Render deploys silently failing since 2026-06-28 (stale lockfile, 652b7ff), CI silently failing since 8e38d19 (pnpm action-setup conflict, 3bf503a), social routes 500ing on every authed call (res.locals.user, 66b7326), unredeemable 3-digit invite codes (66b7326). PROJECT.md requirements marked implemented; SOCIAL-01/02 + TRAVEL-01 registered. GSD tooling migrated to @opengsd/gsd-core 1.6.1.
